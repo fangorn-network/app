@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useQuickAuth,useMiniKit } from "@coinbase/onchainkit/minikit";
 import { useRouter } from "next/navigation";
 import { minikitConfig } from "../minikit.config";
-import styles from "./page.module.css";
 
 interface AuthResponse {
   success: boolean;
@@ -103,12 +102,12 @@ export default function BaseVaultApp() {
     }
   };
 
-  const handleCopyToClipboard = (text) => {
+  const handleCopyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     alert('Copied to clipboard!');
   };
 
-  const handleDeleteSecret = (index) => {
+  const handleDeleteSecret = (index: number) => {
     const newSecrets = secrets.filter((_, i) => i !== index);
     setSecrets(newSecrets);
     setScreen('your-vault');
@@ -117,24 +116,24 @@ export default function BaseVaultApp() {
   // Home Screen
   if (screen === 'home') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-8">
+      <div className="screen-container">
+        <div className="content-wrapper space-y-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-blue-900 mb-2">🔐 Base Vault</h1>
-            <p className="text-gray-600">Secure your secrets on Base blockchain</p>
+            <h1 className="page-title">🔐 Base Vault</h1>
+            <p className="subtitle">Secure your secrets on Base blockchain</p>
           </div>
           
           <div className="space-y-4">
             <button
               onClick={() => { resetCreateVault(); setScreen('create-password'); }}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105"
+              className="btn-primary-lg"
             >
               Create Vault
             </button>
             
             <button
               onClick={() => { setPassword(''); setScreen('access-password'); }}
-              className="w-full bg-white hover:bg-gray-50 text-blue-600 font-semibold py-4 px-6 rounded-xl border-2 border-blue-600 shadow-lg transition-all transform hover:scale-105"
+              className="btn-secondary-lg"
             >
               Access Vault
             </button>
@@ -147,32 +146,32 @@ export default function BaseVaultApp() {
   // Create Vault Flow
   if (screen === 'create-password') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Create Your Vault Password</h2>
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Create Your Vault Password</h2>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="form-label">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              className="input-field"
               placeholder="Enter password"
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="btn-group">
             <button
               onClick={() => setScreen('home')}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-flex btn-neutral"
             >
               Back
             </button>
             <button
               onClick={() => setScreen('confirm-password')}
               disabled={!password}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-flex btn-primary"
             >
               Next
             </button>
@@ -184,32 +183,32 @@ export default function BaseVaultApp() {
 
   if (screen === 'confirm-password') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Confirm Your Password</h2>
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Confirm Your Password</h2>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Re-enter Password</label>
+            <label className="form-label">Re-enter Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              className="input-field"
               placeholder="Confirm password"
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="btn-group">
             <button
               onClick={() => setScreen('create-password')}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-flex btn-neutral"
             >
               Back
             </button>
             <button
               onClick={handleCreateVault}
               disabled={!confirmPassword}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-flex btn-primary"
             >
               Create
             </button>
@@ -221,11 +220,11 @@ export default function BaseVaultApp() {
 
   if (screen === 'creating') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-          <h2 className="text-2xl font-bold text-blue-900">Creating your vault...</h2>
-          <p className="text-gray-600">Deploying to Base</p>
+      <div className="screen-container">
+        <div className="content-wrapper text-center space-y-6">
+          <div className="spinner"></div>
+          <h2 className="section-title">Creating your vault...</h2>
+          <p className="subtitle">Deploying to Base</p>
         </div>
       </div>
     );
@@ -233,12 +232,12 @@ export default function BaseVaultApp() {
 
   if (screen === 'vault-created') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
           <div className="text-center">
-            <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-blue-900 mb-2">Vault Created!</h2>
-            <p className="text-sm text-gray-600 break-all bg-gray-100 p-3 rounded-lg">
+            <div className="icon-lg">✅</div>
+            <h2 className="section-title">Vault Created!</h2>
+            <p className="vault-id">
               {vaultId}
             </p>
           </div>
@@ -246,19 +245,19 @@ export default function BaseVaultApp() {
           <div className="space-y-3">
             <button
               onClick={() => setScreen('add-to-vault')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-primary"
             >
               Add Secret
             </button>
             <button
               onClick={() => handleCopyToClipboard(vaultId)}
-              className="w-full bg-white hover:bg-gray-50 text-blue-600 font-semibold py-3 px-6 rounded-lg border-2 border-blue-600 transition-all"
+              className="btn-secondary"
             >
               Copy Link
             </button>
             <button
               onClick={() => { resetCreateVault(); setScreen('home'); }}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-neutral"
             >
               Done
             </button>
@@ -271,32 +270,32 @@ export default function BaseVaultApp() {
   // Access Vault Flow
   if (screen === 'access-password') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Access Your Vault</h2>
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Access Your Vault</h2>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="form-label">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              className="input-field"
               placeholder="Enter password"
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="btn-group">
             <button
               onClick={() => setScreen('home')}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-flex btn-neutral"
             >
               Back
             </button>
             <button
               onClick={handleAccessVault}
               disabled={!password}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-flex btn-primary"
             >
               Unlock
             </button>
@@ -308,10 +307,10 @@ export default function BaseVaultApp() {
 
   if (screen === 'verifying') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-          <h2 className="text-2xl font-bold text-blue-900">Verifying...</h2>
+      <div className="screen-container">
+        <div className="content-wrapper text-center space-y-6">
+          <div className="spinner"></div>
+          <h2 className="section-title">Verifying...</h2>
         </div>
       </div>
     );
@@ -319,21 +318,21 @@ export default function BaseVaultApp() {
 
   if (screen === 'your-vault') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
-        <div className="max-w-md mx-auto space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Your Vault</h2>
+      <div className="screen-container-top">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Your Vault</h2>
           
-          <div className="bg-white rounded-lg shadow-md p-4 space-y-2">
+          <div className="card space-y-2">
             {secrets.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No secrets stored yet</p>
+              <p className="empty-state">No secrets stored yet</p>
             ) : (
               secrets.map((secret, index) => (
                 <button
                   key={index}
                   onClick={() => { setSelectedSecret({ ...secret, index }); setScreen('view-secret'); }}
-                  className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all"
+                  className="secret-item"
                 >
-                  <div className="font-semibold text-blue-900">{secret.label}</div>
+                  <div className="secret-item-label">{secret.label}</div>
                 </button>
               ))
             )}
@@ -342,19 +341,19 @@ export default function BaseVaultApp() {
           <div className="space-y-3">
             <button
               onClick={() => setScreen('add-to-vault')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-primary"
             >
               Add
             </button>
             <button
               onClick={() => alert('Export functionality coming soon')}
-              className="w-full bg-white hover:bg-gray-50 text-blue-600 font-semibold py-3 px-6 rounded-lg border-2 border-blue-600 transition-all"
+              className="btn-secondary"
             >
               Export
             </button>
             <button
               onClick={() => { setPassword(''); setScreen('home'); }}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-neutral"
             >
               Close
             </button>
@@ -366,21 +365,21 @@ export default function BaseVaultApp() {
 
   if (screen === 'view-secret') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
-        <div className="max-w-md mx-auto space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">{selectedSecret?.label}</h2>
+      <div className="screen-container-top">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">{selectedSecret?.label}</h2>
           
-          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+          <div className="card-lg space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-              <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-900">
+              <label className="form-label">Username</label>
+              <div className="display-field">
                 {selectedSecret?.username || 'N/A'}
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-              <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-900 font-mono">
+              <label className="form-label">Password</label>
+              <div className="display-field-mono">
                 {selectedSecret?.password}
               </div>
             </div>
@@ -388,20 +387,28 @@ export default function BaseVaultApp() {
 
           <div className="space-y-3">
             <button
-              onClick={() => handleCopyToClipboard(selectedSecret?.password)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all"
+              onClick={() =>{ 
+                if (selectedSecret?.password){
+                  handleCopyToClipboard(selectedSecret?.password)
+                }
+            }}
+              className="btn-primary"
             >
               Copy
             </button>
             <button
-              onClick={() => handleDeleteSecret(selectedSecret?.index)}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all"
+              onClick={() => {
+                if (selectedSecret?.password){
+                  handleDeleteSecret(selectedSecret?.index)
+                }
+              }}
+              className="btn-danger"
             >
               Delete
             </button>
             <button
               onClick={() => setScreen('your-vault')}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-neutral"
             >
               Back to Vault
             </button>
@@ -414,20 +421,20 @@ export default function BaseVaultApp() {
   // Add Secret Flow
   if (screen === 'add-to-vault') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Add to Vault</h2>
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Add to Vault</h2>
           
           <div className="space-y-3">
             <button
               onClick={() => setScreen('add-password-label')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-all"
+              className="btn-primary-lg"
             >
               Password
             </button>
             <button
               onClick={() => setScreen(vaultId ? 'your-vault' : 'vault-created')}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-4 px-6 rounded-lg transition-all"
+              className="btn-neutral-lg"
             >
               Back
             </button>
@@ -439,32 +446,32 @@ export default function BaseVaultApp() {
 
   if (screen === 'add-password-label') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Add Password Tag</h2>
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Add Password Tag</h2>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
+            <label className="form-label">Label</label>
             <input
               type="text"
               value={secretLabel}
               onChange={(e) => setSecretLabel(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              className="input-field"
               placeholder="e.g., Gmail, Facebook, etc."
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="btn-group">
             <button
               onClick={() => setScreen('add-to-vault')}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-flex btn-neutral"
             >
               Back
             </button>
             <button
               onClick={() => setScreen('add-password-entry')}
               disabled={!secretLabel}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-flex btn-primary"
             >
               Next
             </button>
@@ -476,45 +483,45 @@ export default function BaseVaultApp() {
 
   if (screen === 'add-password-entry') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-2xl font-bold text-blue-900 text-center">Add Password Entry</h2>
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <h2 className="section-title">Add Password Entry</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username/Email</label>
+              <label className="form-label">Username/Email</label>
               <input
                 type="text"
                 value={secretUsername}
                 onChange={(e) => setSecretUsername(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="input-field"
                 placeholder="Enter username or email"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label className="form-label">Password</label>
               <input
                 type="password"
                 value={secretPassword}
                 onChange={(e) => setSecretPassword(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="input-field"
                 placeholder="Enter password"
               />
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="btn-group">
             <button
               onClick={() => setScreen('add-password-label')}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-flex btn-neutral"
             >
               Back
             </button>
             <button
               onClick={handleAddSecret}
               disabled={!secretPassword}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-flex btn-primary"
             >
               Save
             </button>
@@ -526,23 +533,23 @@ export default function BaseVaultApp() {
 
   if (screen === 'secret-added') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-6">
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
           <div className="text-center">
-            <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-2xl font-bold text-blue-900">Secret Added!</h2>
+            <div className="icon-lg">🎉</div>
+            <h2 className="section-title">Secret Added!</h2>
           </div>
 
           <div className="space-y-3">
             <button
               onClick={() => { resetAddSecret(); setScreen('add-password-label'); }}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-primary"
             >
               Add Another
             </button>
             <button
               onClick={() => setScreen('your-vault')}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all"
+              className="btn-neutral"
             >
               View Vault
             </button>
