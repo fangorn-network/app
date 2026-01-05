@@ -6,19 +6,41 @@ import { mockApi } from "@/utils/mockApi";
 export default function Page() {
     const [secretLabel, setSecretLabel] = useState('');
     const [secretInfo, setSecretInfo] = useState('');
+    const [uploadMode, setUploadMode] = useState('text'); // 'text' or 'file'
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isCreatingEntry, setIsCreatingEntry] = useState(false);
     const router = useRouter();
+    
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        // Optionally read file content
+        const reader = new FileReader();
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const result = event.target?.result;
+          if (typeof result === 'string') {
+            setSecretInfo(result);
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    
     const handleCreateEntry = async () => {
-      const tag = "tag"
+      const tag = secretLabel || "tag";
       setIsCreatingEntry(true);
       const result = await mockApi.addEntry("vaultId", tag);
       if (result.success) {
-        router.push('/access/vault/add/success')
+        router.push('/access/vault/add/success');
       }
-    }
+    };
+    
+    const isFormValid = uploadMode === 'text' ? secretInfo : selectedFile;
+    
     return (
         <div>
-        {isCreatingEntry? (
+        {isCreatingEntry ? (
             <div className="screen-container">
                 <div className="content-wrapper space-y-6">
                     <div className="spinner"></div>
@@ -43,15 +65,64 @@ export default function Page() {
             </div>
             
             <div>
-              <label className="form-label">Data</label>
-              <input
-                type="text"
-                value={secretInfo}
-                onChange={(e) => setSecretInfo(e.target.value)}
-                className="input-field"
-                placeholder="Enter data"
-              />
+              <label className="form-label">Data Input Method</label>
+              <div className="toggle-button-group">
+                <button
+                  type="button"
+                  onClick={() => setUploadMode('text')}
+                  className={uploadMode === 'text' ? 'toggle-button-active' : 'toggle-button'}
+                >
+                  Text Input
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUploadMode('file')}
+                  className={uploadMode === 'file' ? 'toggle-button-active' : 'toggle-button'}
+                >
+                  File Upload
+                </button>
+              </div>
             </div>
+            
+            {uploadMode === 'text' ? (
+              <div>
+                <label className="form-label">Data</label>
+                <input
+                  type="text"
+                  value={secretInfo}
+                  onChange={(e) => setSecretInfo(e.target.value)}
+                  className="input-field"
+                  placeholder="Enter data"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="form-label">Upload File</label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="input-field"
+                  accept=".txt,.json,.csv"
+                />
+                {selectedFile && (
+                  <div className="file-info-box">
+                    <p className="file-info-text">
+                      Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setSecretInfo('');
+                      }}
+                      className="file-remove-button"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="btn-group">
@@ -63,7 +134,7 @@ export default function Page() {
             </button>
             <button
               onClick={handleCreateEntry}
-              disabled={!secretInfo}
+              disabled={!isFormValid}
               className="btn-flex btn-primary"
             >
               Save
@@ -71,8 +142,7 @@ export default function Page() {
           </div>
         </div>
       </div>
-                )}
+        )}
         </div>
-     
     );
 }
