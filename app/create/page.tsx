@@ -1,21 +1,26 @@
 'use client'
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { mockApi } from "../../utils/mockApi";
+import { mockApi } from "@/utils/mockApi";
+import {poseidon2HashAsync} from "@zkpassport/poseidon2";
+import {stringToBigInt} from "@/utils/utils"
 
 export default function Page() {
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isCreatingVault, setIsCreatingVault] = useState(false);
+    const [loadingText, setLoadingText] = useState("Hashing Password...")
 
-    const passwordsMatch = password && confirmPassword && password === confirmPassword;
+    const passwordsMatch = password === confirmPassword;
     const canProceed = password && confirmPassword && passwordsMatch;
     const router = useRouter();
     const handleCreateVault = async () => {
-      console.log("CLICK")
       setIsCreatingVault(true);
-      const result = await mockApi.createVault(password);
+      const passwordBigIntArray = stringToBigInt(password);
+      const passwordHash = await poseidon2HashAsync(passwordBigIntArray);
+      setLoadingText("Creating Vault...");
+      const result = await mockApi.createVault(passwordHash);
       if (result.success) {
         router.push("/create/success")
       }
@@ -26,7 +31,7 @@ export default function Page() {
           <div className="screen-container">
                 <div className="content-wrapper space-y-6">
                     <div className="spinner"></div>
-                    <h2 className="section-title">Creating Vault...</h2>
+                    <h2 className="section-title">{loadingText}</h2>
                 </div>
             </div>
           ): (

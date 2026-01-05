@@ -1,9 +1,8 @@
 'use client'
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
-    const secrets = [{label: "a tag", cid: "cid"}]
+    const entries = [{label: "a tag", cid: "cid"}]
     const router = useRouter();
 
     return (
@@ -12,16 +11,16 @@ export default function Page() {
           <h2 className="section-title">Your Vault</h2>
           
           <div className="card space-y-2">
-            {secrets.length === 0 ? (
+            {entries.length === 0 ? (
               <p className="empty-state">No secrets stored yet</p>
             ) : (
-              secrets.map((secret, index) => (
+              entries.map((entry, index) => (
                 <button
                   key={index}
                   onClick={() => {}}
                   className="secret-item"
                 >
-                  <div className="secret-item-label">{secret.label}</div>
+                  <div className="secret-item-label">{entry.label}</div>
                 </button>
               ))
             )}

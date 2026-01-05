@@ -12,7 +12,7 @@ export default function Page() {
     const handleAccessVault = async () => {
       setIsLoading(true);
       const vaultId = '123';
-      const result = await mockApi.verifyPassword(vaultId, password);
+      const result = await mockApi.getAllEntries(vaultId);
       setIsLoading(false);
       if (result.success) {
         router.push("/access/vault");

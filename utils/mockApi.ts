@@ -1,18 +1,22 @@
 
 export const mockApi = {
-  createVault: async (password: string) => {
+  createVault: async (passwordHash: bigint) => {
     await new Promise(resolve => setTimeout(resolve, 2000));
     return { success: true, vaultId: 'vault_' + Date.now() };
   },
-  verifyPassword: async (vaultId: string, password: string) => {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return { success: true, secrets: [] as Secret[] };
-  },
-  addSecret: async (vaultId: string, label: string, username: string, password: string) => {
+  addEntry: async (vaultId: string, cid: string, tag: string) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    return { success: true };
+    return {success: true}
   },
-  addEntry: async (vaultId: string, label: string) => {
+  submitProof: async (vaultId: string, nullifier: string, proof: string) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return {success: true}
+  },
+  getEntry: async(vaultId: string, entryIndex: number) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return {success: true}
+  },
+  getAllEntries: async(vaultId: string) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     return {success: true}
   }
