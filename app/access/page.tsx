@@ -1,19 +1,20 @@
 'use client'
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { mockApi } from "@/utils/mockApi";
 import { useRouter } from "next/navigation";
+import { AppContext } from "../contextProvider";
 
 export default function Page() {
-
+    const {setVaultId} = useContext(AppContext);
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     const handleAccessVault = async () => {
       setIsLoading(true);
-      const vaultId = '123';
+      const vaultId = 'vault_id_access';
+      setVaultId(vaultId);
       const result = await mockApi.getAllEntries(vaultId);
-      setIsLoading(false);
       if (result.success) {
         router.push("/access/vault");
       }

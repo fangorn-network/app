@@ -1,26 +1,34 @@
 'use client'
+import { AppContext } from "@/app/contextProvider";
 import { useRouter } from "next/navigation";
+import { useContext} from "react";
 
 export default function Page() {
-    const entries = [{label: "a tag", cid: "cid"}]
+    const {vaultId, setVaultId, entries, setEntries} = useContext(AppContext);
     const router = useRouter();
+
+    const handleCloseVault = async () => {
+      setVaultId("");
+      setEntries([]);
+      router.push('/');
+    };
 
     return (
       <div className="screen-container-top">
         <div className="content-wrapper space-y-6">
-          <h2 className="section-title">Your Vault</h2>
+          <h2 className="section-title">Your Vault: {vaultId}</h2>
           
           <div className="card space-y-2">
-            {entries.length === 0 ? (
+            {entries?.length === 0 ? (
               <p className="empty-state">No secrets stored yet</p>
             ) : (
-              entries.map((entry, index) => (
+              entries?.map((entry, index) => (
                 <button
                   key={index}
                   onClick={() => {}}
                   className="secret-item"
                 >
-                  <div className="secret-item-label">{entry.label}</div>
+                  <div className="secret-item-label">{entry.tag}</div>
                 </button>
               ))
             )}
@@ -40,7 +48,7 @@ export default function Page() {
               Export
             </button>
             <button
-              onClick={() => router.push("/")}
+              onClick={handleCloseVault}
               className="btn-neutral"
             >
               Close

@@ -1,12 +1,14 @@
 'use client'
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { mockApi } from "@/utils/mockApi";
 import {poseidon2HashAsync} from "@zkpassport/poseidon2";
 import {stringToBigInt} from "@/utils/utils"
+import { AppContext } from "../contextProvider";
 
 export default function Page() {
-
+  
+    const {setVaultId} = useContext(AppContext);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isCreatingVault, setIsCreatingVault] = useState(false);
@@ -21,6 +23,7 @@ export default function Page() {
       const passwordHash = await poseidon2HashAsync(passwordBigIntArray);
       setLoadingText("Creating Vault...");
       const result = await mockApi.createVault(passwordHash);
+      setVaultId("FreshVaultId");
       if (result.success) {
         router.push("/create/success")
       }

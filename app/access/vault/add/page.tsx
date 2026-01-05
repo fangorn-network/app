@@ -1,9 +1,11 @@
 'use client'
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { mockApi } from "@/utils/mockApi";
+import { AppContext } from "@/app/contextProvider";
 
 export default function Page() {
+    const {vaultId, entries, setEntries} = useContext(AppContext)
     const [secretLabel, setSecretLabel] = useState('');
     const [secretInfo, setSecretInfo] = useState('');
     const [uploadMode, setUploadMode] = useState('text'); // 'text' or 'file'
@@ -29,8 +31,12 @@ export default function Page() {
     
     const handleCreateEntry = async () => {
       const tag = secretLabel || "tag";
+      const cid = Math.random().toString(36).substring(2, 15);
       setIsCreatingEntry(true);
-      const result = await mockApi.addEntry("vaultId", tag);
+      const result = await mockApi.addEntry(vaultId!, cid, tag);
+      const createdAt = BigInt(123);
+      let vaultEntry = {cid, tag, provider: 0, createdAt};
+      setEntries([...(entries ?? []), vaultEntry]);
       if (result.success) {
         router.push('/access/vault/add/success');
       }
