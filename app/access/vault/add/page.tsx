@@ -35,7 +35,7 @@ export default function Page() {
     setIsCreatingEntry(true);
     const result = await mockApi.addEntry(vaultId!, cid, tag);
     const createdAt = BigInt(123);
-    let vaultEntry = { cid, tag, provider: 0, createdAt };
+    const vaultEntry = { cid, tag, provider: 0, createdAt };
     setEntries([...(entries ?? []), vaultEntry]);
     if (result.success) {
       router.push('/access/vault/add/success');
