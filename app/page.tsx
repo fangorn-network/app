@@ -1,44 +1,48 @@
-"use client";
+'use client';
 
-import { useMiniKit } from "@coinbase/onchainkit/minikit";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useMiniKit } from '@coinbase/onchainkit/minikit';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function BaseVaultApp() {
   const { isMiniAppReady, setMiniAppReady, context } = useMiniKit();
-    // Initialize the miniapp
+  // Initialize the miniapp
   useEffect(() => {
     if (!isMiniAppReady) {
       setMiniAppReady();
     }
   }, [setMiniAppReady, isMiniAppReady]);
   const router = useRouter();
-    return (
-      <div className="screen-container">
-        <div className="content-wrapper space-y-8">
-          <div className="text-center">
-            <h1 className="page-title">🔐 Base Vault</h1>
-            <p className="subtitle">Secure your secrets on Base blockchain</p>
-          </div>
-          
-          <div className="space-y-4">
-            <button
-              onClick={() => {router.push("/create")}}
-              className="btn-primary-lg"
-            >
-              Create Vault
-            </button>
-            
-            <button
-              onClick={() => { router.push("/access");}}
-              className="btn-secondary-lg"
-            >
-              Access Vault
-            </button>
-          </div>
+  return (
+    <div className="screen-container">
+      <div className="content-wrapper space-y-8">
+        <div className="text-center">
+          <h1 className="page-title">🔐 Base Vault</h1>
+          <p className="subtitle">Secure your secrets on Base blockchain</p>
+        </div>
+
+        <div className="space-y-4">
+          <button
+            onClick={() => {
+              router.push('/create');
+            }}
+            className="btn-primary-lg"
+          >
+            Create Vault
+          </button>
+
+          <button
+            onClick={() => {
+              router.push('/access');
+            }}
+            className="btn-secondary-lg"
+          >
+            Access Vault
+          </button>
         </div>
       </div>
-    );
+    </div>
+  );
 }
 
 // export default function Home() {
@@ -53,8 +57,6 @@ export default function BaseVaultApp() {
 //       setFrameReady();
 //     }
 //   }, [setFrameReady, isFrameReady]);
- 
-  
 
 //   // If you need to verify the user's identity, you can use the useQuickAuth hook.
 //   // This hook will verify the user's signature and return the user's FID. You can update
@@ -103,7 +105,7 @@ export default function BaseVaultApp() {
 //     // TODO: Save email to database/API with user FID
 //     console.log("Valid email submitted:", email);
 //     console.log("User authenticated:", authData.user);
-    
+
 //     // Navigate to success page
 //     router.push("/success");
 //   };
@@ -113,11 +115,11 @@ export default function BaseVaultApp() {
 //       <button className={styles.closeButton} type="button">
 //         ✕
 //       </button>
-      
+
 //       <div className={styles.content}>
 //         <div className={styles.waitlistForm}>
 //           <h1 className={styles.title}>Join {minikitConfig.miniapp.name.toUpperCase()}</h1>
-          
+
 //           <p className={styles.subtitle}>
 //              Hey {context?.user?.displayName || "there"}, Get early access and be the first to experience the future of<br />
 //             crypto marketing strategy.
@@ -131,9 +133,9 @@ export default function BaseVaultApp() {
 //               onChange={(e) => setEmail(e.target.value)}
 //               className={styles.emailInput}
 //             />
-            
+
 //             {error && <p className={styles.error}>{error}</p>}
-            
+
 //             <button type="submit" className={styles.joinButton}>
 //               JOIN WAITLIST
 //             </button>

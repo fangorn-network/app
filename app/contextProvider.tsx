@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { createContext, useState, ReactNode } from 'react';
 
@@ -10,16 +10,16 @@ type VaultContextType = {
 };
 
 export const AppContext = createContext<VaultContextType>({
-  vaultId: "",
+  vaultId: '',
   entries: [],
   setVaultId: () => {},
-  setEntries: () => {}
+  setEntries: () => {},
 });
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
   const [vaultId, setVaultId] = useState('');
   const [entries, setEntries] = useState<VaultEntry[]>([]);
-  
+
   return (
     <AppContext.Provider value={{ vaultId, setVaultId, entries, setEntries }}>
       {children}
