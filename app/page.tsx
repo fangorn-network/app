@@ -1,8 +1,17 @@
 "use client";
 
+import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function BaseVaultApp() {
+  const { isMiniAppReady, setMiniAppReady, context } = useMiniKit();
+    // Initialize the miniapp
+  useEffect(() => {
+    if (!isMiniAppReady) {
+      setMiniAppReady();
+    }
+  }, [setMiniAppReady, isMiniAppReady]);
   const router = useRouter();
     return (
       <div className="screen-container">
