@@ -1,9 +1,6 @@
 'use client';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/utils/mockApi';
-import { poseidon2HashAsync } from '@zkpassport/poseidon2';
-import { stringToBigInt } from '@/utils/utils';
 import { AppContext } from '../providers/vaultContextProvider';
 import { FangornContext } from '../providers/fangornProvider';
 export default function Page() {
@@ -20,7 +17,6 @@ export default function Page() {
   const handleCreateVault = async () => {
     setIsCreatingVault(true);
     setLoadingText('Creating Vault...');
-    // const result = await fetch('/api/');
 
     const vaultId = await client?.createVault(password);
 

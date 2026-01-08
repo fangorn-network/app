@@ -1,6 +1,5 @@
 'use client';
 import { useContext, useEffect, useState } from 'react';
-import { mockApi } from '@/utils/mockApi';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '../providers/vaultContextProvider';
 import { FangornContext } from '../providers/fangornProvider';
