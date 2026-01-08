@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function BaseVaultApp() {
-  const { isMiniAppReady, setMiniAppReady } = useMiniKit();
+  // const { isMiniAppReady, setMiniAppReady } = useMiniKit();
   // Initialize the miniapp
-  useEffect(() => {
-    if (!isMiniAppReady) {
-      setMiniAppReady();
-    }
-  }, [setMiniAppReady, isMiniAppReady]);
+  // useEffect(() => {
+  //   if (!isMiniAppReady) {
+  //     setMiniAppReady();
+  //   }
+  // }, [setMiniAppReady, isMiniAppReady]);
   const router = useRouter();
   return (
     <div className="screen-container">

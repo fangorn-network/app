@@ -1,15 +1,27 @@
 'use client';
 
-import { useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '../../providers/vaultContextProvider';
+import { VaultEntry } from 'fangorn/lib/types/types';
+
+interface EntryContextType {
+  selectedEntry: VaultEntry | null;
+  setSelectedEntry: (state: VaultEntry) => void;
+}
+
+export const EntryContext = createContext<EntryContextType>({
+  selectedEntry: null,
+  setSelectedEntry: () => {}
+});
 
 export default function StartLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { currentVaultId} = useContext(AppContext);
+  const [selectedEntry, setSelectedEntry] = useState<VaultEntry | null>(null)
+  const { currentVaultId } = useContext(AppContext);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,5 +46,5 @@ export default function StartLayout({
     );
   }
 
-  return <>{children}</>;
+  return <EntryContext.Provider value = {{selectedEntry, setSelectedEntry}}>{children}</EntryContext.Provider>;
 }

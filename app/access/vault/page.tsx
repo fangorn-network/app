@@ -3,9 +3,12 @@ import { FangornContext } from '@/app/providers/fangornProvider';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
+import { EntryContext } from './layout';
+import { VaultEntry } from 'fangorn/lib/types/types';
 
 export default function Page() {
   const { currentVaultId, entries, setEntries, setVault, setVaultManifest, vault, cleanupVaultContext} = useContext(AppContext);
+  const {setSelectedEntry} = useContext(EntryContext);
   const { client } = useContext(FangornContext);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingText, setLoadingText] = useState('');
@@ -15,6 +18,12 @@ export default function Page() {
     cleanupVaultContext();
     router.push('/');
   };
+
+  const handleEntryClick = (entry: VaultEntry) => {
+    setSelectedEntry(entry);
+    router.push("/access/vault/entry")
+  };
+
 
   useEffect(() => {
     const loadVault = async() => {
@@ -48,7 +57,7 @@ export default function Page() {
           </div>
         </div>
       ):(
-        <div className="screen-container-top">
+      <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
         <h2 className="section-title">Your Vault: {currentVaultId}</h2>
 
@@ -57,7 +66,7 @@ export default function Page() {
             <p className="empty-state">No secrets stored yet</p>
           ) : (
             entries?.map((entry, index) => (
-              <button key={index} onClick={() => {}} className="secret-item">
+              <button key={index} onClick={() => handleEntryClick(entry)} className="secret-item">
                 <div className="secret-item-label">{entry.tag}</div>
               </button>
             ))

@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { Fangorn } from 'fangorn';
 import { Address } from 'viem/accounts';
+import { getAddress } from 'viem';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -80,9 +81,19 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    // try {
+    //   const msg = `0x${Buffer.from("Hey sign in plz", "utf8").toString("hex")}`
+    //   const sign = await window.ethereum.request({
+    //     method: "personal_sign",
+    //     params: [msg, userAccount]
+    //   })
+    // } catch (err) {
+    //   console.error(err)
+    // }
+
       const rpcUrl = process.env.NEXT_PUBLIC_CHAIN_RPC_URL;
       const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-      const zkGateAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address;
+      const zkGateAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as Address;
       console.log("importing env vars")
       if (!rpcUrl) throw new Error('NEXT_PUBLIC_CHAIN_RPC_URL required');
       if (!gateway) throw new Error('NEXT_PUBLIC_PINATA_GATEWAY required');
@@ -130,12 +141,4 @@ export function FangornProvider({ children }: { children: ReactNode }) {
       {children}
     </FangornContext.Provider>
   );
-}
-
-export function useFangorn() {
-  const context = useContext(FangornContext);
-  if (context === undefined) {
-    throw new Error('useFangorn must be used within a FangornProvider');
-  }
-  return context;
 }

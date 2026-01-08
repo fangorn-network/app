@@ -38,10 +38,12 @@ export default function Page() {
     setIsCreatingEntry(true);
     if (uploadMode === 'text') {
       const data = secretInfo;
-      fileData = {tag, data};
+      fileData = {tag, data, extension: ".txt", fileType: "text/plain"};
     } else {
       const data = secretInfo;
-      fileData = {tag, data};
+      const extension = selectedFile!.name.slice(selectedFile!.name.lastIndexOf('.'));
+      const fileType = selectedFile!.type;
+      fileData = {tag, data, extension, fileType};
     }
     setLoadingText('Uploading new entry...')
     let vaultHex = currentVaultId as`0x${string}`
@@ -54,7 +56,7 @@ export default function Page() {
     router.push('/access/vault/add/success');
   };
 
-  const isFormValid = uploadMode === 'text' ? secretInfo : selectedFile;
+  const isFormValid = (uploadMode === 'text' ? secretInfo : selectedFile) && secretLabel;
 
   return (
     <div>
