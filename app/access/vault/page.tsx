@@ -1,22 +1,56 @@
 'use client';
-import { AppContext } from '@/app/contextProvider';
+import { FangornContext } from '@/app/providers/fangornProvider';
+import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 export default function Page() {
-  const { vaultId, setVaultId, entries, setEntries } = useContext(AppContext);
+  const { currentVaultId, entries, setEntries, setVault, setVaultManifest, vault, cleanupVaultContext} = useContext(AppContext);
+  const { client } = useContext(FangornContext);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('');
   const router = useRouter();
 
   const handleCloseVault = async () => {
-    setVaultId('');
-    setEntries([]);
+    cleanupVaultContext();
     router.push('/');
   };
 
+  useEffect(() => {
+    const loadVault = async() => {
+      setLoadingText('Loading vault...')
+      let vaultHex = currentVaultId as`0x${string}`
+      const vault = await client?.getVault(vaultHex!);
+      setVault(vault!)
+      if (vault?.manifestCid) {
+        setLoadingText('Loading manifest...')
+        const manifest = await client?.fetchManifest(vault.manifestCid);
+        setVaultManifest(manifest!);
+        setEntries(manifest!.entries!);
+      }
+      setIsLoading(false);
+    }
+    if(vault) {
+      setIsLoading(false);
+    } else {
+      loadVault();
+    }
+  })
+
   return (
-    <div className="screen-container-top">
+    <div>
+    {
+      isLoading? (
+        <div className="screen-container">
+          <div className="content-wrapper space-y-6">
+            <div className="spinner"></div>
+            <h2 className="section-title">{loadingText}</h2>
+          </div>
+        </div>
+      ):(
+        <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
-        <h2 className="section-title">Your Vault: {vaultId}</h2>
+        <h2 className="section-title">Your Vault: {currentVaultId}</h2>
 
         <div className="card space-y-2">
           {entries?.length === 0 ? (
@@ -48,6 +82,9 @@ export default function Page() {
           </button>
         </div>
       </div>
+    </div>
+      )
+    }
     </div>
   );
 }

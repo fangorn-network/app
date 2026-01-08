@@ -1,16 +1,19 @@
 'use client';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/utils/mockApi';
-import { AppContext } from '@/app/contextProvider';
+import { AppContext } from '@/app/providers/vaultContextProvider';
+import { FangornContext } from '@/app/providers/fangornProvider';
+import { Filedata } from 'fangorn';
 
 export default function Page() {
-  const { vaultId, entries, setEntries } = useContext(AppContext);
+  const { currentVaultId, entries, setEntries, litActionCid, setVaultManifest } = useContext(AppContext);
+  const { client } = useContext(FangornContext);
   const [secretLabel, setSecretLabel] = useState('');
   const [secretInfo, setSecretInfo] = useState('');
   const [uploadMode, setUploadMode] = useState('text'); // 'text' or 'file'
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isCreatingEntry, setIsCreatingEntry] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
   const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,15 +34,24 @@ export default function Page() {
 
   const handleCreateEntry = async () => {
     const tag = secretLabel || 'tag';
-    const cid = Math.random().toString(36).substring(2, 15);
+    let fileData: Filedata;
     setIsCreatingEntry(true);
-    const result = await mockApi.addEntry(vaultId!, cid, tag);
-    const createdAt = BigInt(123);
-    const vaultEntry = { cid, tag, provider: 0, createdAt };
-    setEntries([...(entries ?? []), vaultEntry]);
-    if (result.success) {
-      router.push('/access/vault/add/success');
+    if (uploadMode === 'text') {
+      const data = secretInfo;
+      fileData = {tag, data};
+    } else {
+      const data = secretInfo;
+      fileData = {tag, data};
     }
+    setLoadingText('Uploading new entry...')
+    let vaultHex = currentVaultId as`0x${string}`
+    const manifestInfo = await client?.upload(vaultHex, [fileData], litActionCid!, false);
+    setLoadingText('Retreiving new manifest...')
+    const manifest = await client?.fetchManifest(manifestInfo?.manifestCid!);
+    setVaultManifest(manifest!);
+    setEntries(manifest!.entries!);
+    setLoadingText('Complete!')
+    router.push('/access/vault/add/success');
   };
 
   const isFormValid = uploadMode === 'text' ? secretInfo : selectedFile;
@@ -50,7 +62,7 @@ export default function Page() {
         <div className="screen-container">
           <div className="content-wrapper space-y-6">
             <div className="spinner"></div>
-            <h2 className="section-title">Creating Vault Entry...</h2>
+            <h2 className="section-title">{loadingText}</h2>
           </div>
         </div>
       ) : (
@@ -116,7 +128,8 @@ export default function Page() {
                     type="file"
                     onChange={handleFileChange}
                     className="input-field"
-                    accept=".txt,.json,.csv"
+                    accept=".txt,.json,.csv,.png,.jpeg,.gif"
+                    key={selectedFile?.name || 'file-input'}
                   />
                   {selectedFile && (
                     <div className="file-info-box">

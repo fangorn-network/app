@@ -2,26 +2,26 @@
 
 import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppContext } from '../../contextProvider';
+import { AppContext } from '../../providers/vaultContextProvider';
 
 export default function StartLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { vaultId } = useContext(AppContext);
+  const { currentVaultId} = useContext(AppContext);
   const router = useRouter();
 
   useEffect(() => {
-    if (!vaultId) {
+    if (!currentVaultId) {
       const timer = setTimeout(() => {
         router.push('/');
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [vaultId, router]);
+  }, [currentVaultId, router]);
 
-  if (!vaultId) {
+  if (!currentVaultId) {
     return (
       <div className="screen-container">
         <div className="content-wrapper space-y-6">

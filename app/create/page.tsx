@@ -4,10 +4,11 @@ import { useRouter } from 'next/navigation';
 import { mockApi } from '@/utils/mockApi';
 import { poseidon2HashAsync } from '@zkpassport/poseidon2';
 import { stringToBigInt } from '@/utils/utils';
-import { AppContext } from '../contextProvider';
-
+import { AppContext } from '../providers/vaultContextProvider';
+import { FangornContext } from '../providers/fangornProvider';
 export default function Page() {
   const { setVaultId } = useContext(AppContext);
+  const {client} = useContext(FangornContext);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isCreatingVault, setIsCreatingVault] = useState(false);
@@ -18,14 +19,20 @@ export default function Page() {
   const router = useRouter();
   const handleCreateVault = async () => {
     setIsCreatingVault(true);
-    const passwordBigIntArray = stringToBigInt(password);
-    const passwordHash = await poseidon2HashAsync(passwordBigIntArray);
     setLoadingText('Creating Vault...');
-    const result = await mockApi.createVault(passwordHash);
-    setVaultId('FreshVaultId');
-    if (result.success) {
+    // const result = await fetch('/api/');
+
+    const vaultId = await client?.createVault(password);
+
+    console.log("vaultId: ", vaultId)
+
+    if (vaultId) {
+      setVaultId(vaultId);
       router.push('/create/success');
+    } else {
+      throw new Error("Vault ID Creation Failed");
     }
+
   };
   return (
     <div>

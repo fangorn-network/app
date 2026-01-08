@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { Inter, Source_Code_Pro } from 'next/font/google';
 import { SafeArea } from '@coinbase/onchainkit/minikit';
 import { minikitConfig } from '../minikit.config';
-import { RootProvider } from './rootProvider';
+import { RootProvider } from './providers/rootProvider';
 import './globals.css';
-import { AppContextProvider } from './contextProvider';
+import { AppContextProvider } from './providers/vaultContextProvider';
+import { FangornProvider } from './providers/fangornProvider';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -42,14 +43,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AppContextProvider>
-      <RootProvider>
-        <html lang="en">
-          <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-            <SafeArea>{children}</SafeArea>
-          </body>
-        </html>
-      </RootProvider>
-    </AppContextProvider>
+    <FangornProvider>
+      <AppContextProvider>
+        <RootProvider>
+          <html lang="en">
+            <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+              <SafeArea>{children}</SafeArea>
+            </body>
+          </html>
+        </RootProvider>
+      </AppContextProvider>
+    </FangornProvider>
   );
 }

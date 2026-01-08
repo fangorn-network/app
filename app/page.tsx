@@ -17,8 +17,8 @@ export default function BaseVaultApp() {
     <div className="screen-container">
       <div className="content-wrapper space-y-8">
         <div className="text-center">
-          <h1 className="page-title">🔐 Base Vault</h1>
-          <p className="subtitle">Secure your secrets on Base blockchain</p>
+          <h1 className="page-title">Fangorn Vault</h1>
+          <p className="subtitle">Secure data storage on Base</p>
         </div>
 
         <div className="space-y-4">
