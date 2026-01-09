@@ -6,12 +6,13 @@ import {VaultEntry, VaultManifest} from 'fangorn/lib/types/types.js';
 
 type VaultContextType = {
   currentVaultId?: string;
+  currentVaultName?: string;
   allVaults?: string[];
   vault?: Vault | null;
   manifest?: VaultManifest | null;
   entries?: VaultEntry[];
-  litActionCid?: string;
   setVaultId: (state: string) => void;
+  setVaultName: (state: string) => void;
   setEntries: (state: VaultEntry[]) => void;
   setVaults: (state: string[]) => void;
   setVault: (state: Vault | null) => void;
@@ -21,12 +22,13 @@ type VaultContextType = {
 
 export const AppContext = createContext<VaultContextType>({
   currentVaultId: '',
+  currentVaultName: '',
   entries: [],
   allVaults: [],
-  litActionCid: '',
   vault: undefined,
   manifest: undefined,
   setVaultId: () => {},
+  setVaultName: () => {},
   setEntries: () => {},
   setVaults: () => {},
   setVault: () => undefined,
@@ -36,23 +38,22 @@ export const AppContext = createContext<VaultContextType>({
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
   const [currentVaultId, setVaultId] = useState('');
+  const [currentVaultName, setVaultName] = useState('');
   const [entries, setEntries] = useState<VaultEntry[]>([]);
   const [allVaults, setVaults] = useState(['']);
   const [vault, setVault] = useState<Vault | null>();
   const [manifest, setVaultManifest] = useState<VaultManifest | null>();
-  const providedLitActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
-  if (!providedLitActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID; required');
-  const [litActionCid] = useState(providedLitActionCid);
 
   const cleanupVaultContext = () => {
     setVaultId('');
+    setVaultName('');
     setEntries([]);
     setVault(null);
     setVaultManifest(null);
   }
 
   return (
-    <AppContext.Provider value={{ currentVaultId, setVaultId, entries, setEntries, allVaults, setVaults, litActionCid, vault, setVault, manifest, setVaultManifest, cleanupVaultContext }}>
+    <AppContext.Provider value={{ currentVaultId, setVaultId, currentVaultName, setVaultName, entries, setEntries, allVaults, setVaults, vault, setVault, manifest, setVaultManifest, cleanupVaultContext }}>
       {children}
     </AppContext.Provider>
   );

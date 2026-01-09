@@ -7,18 +7,19 @@ export default function Page() {
   const { setVaultId } = useContext(AppContext);
   const {client} = useContext(FangornContext);
   const [password, setPassword] = useState('');
+  const [vaultName, setVaultName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isCreatingVault, setIsCreatingVault] = useState(false);
   const [loadingText, setLoadingText] = useState('Hashing Password...');
 
   const passwordsMatch = password === confirmPassword;
-  const canProceed = password && confirmPassword && passwordsMatch;
+  const canProceed = password && confirmPassword && passwordsMatch && vaultName;
   const router = useRouter();
   const handleCreateVault = async () => {
     setIsCreatingVault(true);
     setLoadingText('Creating Vault...');
 
-    const vaultId = await client?.createVault(password);
+    const vaultId = await client?.createVault(vaultName, password);
 
     console.log("vaultId: ", vaultId)
 
@@ -26,7 +27,7 @@ export default function Page() {
       setVaultId(vaultId);
       router.push('/create/success');
     } else {
-      throw new Error("Vault ID Creation Failed");
+      throw new Error("Vault Creation Failed");
     }
 
   };
@@ -42,7 +43,17 @@ export default function Page() {
       ) : (
         <div className="screen-container">
           <div className="content-wrapper space-y-6">
-            <h2 className="section-title">Create Your Vault Password</h2>
+            <h2 className="section-title">Create Your Vault</h2>
+            <div>
+              <label className="form-label">Vault Name</label>
+              <input
+                type="text"
+                value={vaultName}
+                onChange={(e) => setVaultName(e.target.value)}
+                className="input-field"
+                placeholder="Enter Vault Name"
+              />
+            </div>
             <div>
               <label className="form-label">Password</label>
               <input

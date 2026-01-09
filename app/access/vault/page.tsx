@@ -7,7 +7,7 @@ import { EntryContext } from './layout';
 import { VaultEntry } from 'fangorn/lib/types/types';
 
 export default function Page() {
-  const { currentVaultId, entries, setEntries, setVault, setVaultManifest, vault, cleanupVaultContext} = useContext(AppContext);
+  const { currentVaultId, entries, setEntries, setVault, setVaultManifest, vault, cleanupVaultContext, setVaultName, currentVaultName} = useContext(AppContext);
   const {setSelectedEntry} = useContext(EntryContext);
   const { client } = useContext(FangornContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +30,7 @@ export default function Page() {
       setLoadingText('Loading vault...')
       let vaultHex = currentVaultId as`0x${string}`
       const vault = await client?.getVault(vaultHex!);
+      setVaultName(vault!.name);
       setVault(vault!)
       if (vault?.manifestCid) {
         setLoadingText('Loading manifest...')
@@ -59,7 +60,7 @@ export default function Page() {
       ):(
       <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
-        <h2 className="section-title">Your Vault: {currentVaultId}</h2>
+        <h2 className="section-title">Your Vault: {currentVaultName}</h2>
 
         <div className="card space-y-2">
           {entries?.length === 0 ? (

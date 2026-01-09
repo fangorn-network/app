@@ -1,50 +1,42 @@
 'use client';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { FangornContext } from '@/app/providers/fangornProvider';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useContext, useState } from 'react';
 import { EntryContext } from '../layout';
-import {getAddress} from "viem";
 import circuit from "fangorn/circuits/preimage/target/preimage.json";
 
 export default function Page() {
-  const { currentVaultId, entries } = useContext(AppContext);
+  const { currentVaultId, currentVaultName } = useContext(AppContext);
   const {selectedEntry} = useContext(EntryContext);
   const { client } = useContext(FangornContext);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
-
-//   useEffect(() => {
-//     // Get entry index from URL params
-//     const entryIndex = searchParams.get('index');
-    
-//     if (entryIndex !== null && entries) {
-//       const entry = entries[parseInt(entryIndex)];
-//       setSelectedEntry(entry);
-//     } else {
-//       // If no valid entry, redirect back to vault
-//       router.push('/access/vault');
-//     }
-//   }, [searchParams, entries, router]);
 
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
     
     try {
-      // Add your decryption and download logic here
-      console.log('Decrypting and downloading:', selectedEntry, 'with password:', password);
+      console.log('Decrypting and downloading:', selectedEntry?.tag, 'with password:', password, 'MIME type: ', selectedEntry?.fileType, 'and extension: ', selectedEntry?.extension);
       
-      // Simulate decryption delay
-    //   await new Promise(resolve => setTimeout(resolve, 1000));
       const decryptedContent = await client?.decryptFile(currentVaultId as`0x${string}`, selectedEntry?.tag!, password, circuit)
-      
-      // After successful decryption:
-      // 1. Decrypt the file
-      // 2. Create a blob and download
-      // Example:
-      const blob = new Blob([decryptedContent!], { type: selectedEntry?.fileType });
+      const dataString = new TextDecoder().decode(decryptedContent);
+      let blob;
+
+      if (selectedEntry?.fileType !== 'text/plain') {
+            // Decode base64 to binary
+            const binaryString = atob(dataString);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            blob = new Blob([bytes], { type: selectedEntry?.fileType });
+
+        } else {
+            blob = new Blob([dataString], { type: selectedEntry?.fileType });
+        }
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -56,6 +48,7 @@ export default function Page() {
       console.error('Decryption failed:', error);
     } finally {
       setIsDecrypting(false);
+      setPassword('');
     }
   };
 
@@ -82,7 +75,7 @@ export default function Page() {
   return (
     <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
-        <h2 className="section-title">{currentVaultId}</h2>
+        <h2 className="section-title">{currentVaultName}</h2>
 
         <div className="card-lg space-y-4">
           <div>

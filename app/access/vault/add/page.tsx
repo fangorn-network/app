@@ -3,10 +3,10 @@ import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { FangornContext } from '@/app/providers/fangornProvider';
-import { Filedata } from 'fangorn';
+import { Filedata } from 'fangorn/lib/types/types';
 
 export default function Page() {
-  const { currentVaultId, entries, setEntries, litActionCid, setVaultManifest } = useContext(AppContext);
+  const { currentVaultId, setEntries, setVaultManifest } = useContext(AppContext);
   const { client } = useContext(FangornContext);
   const [secretLabel, setSecretLabel] = useState('');
   const [secretInfo, setSecretInfo] = useState('');
@@ -18,18 +18,19 @@ export default function Page() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      // Optionally read file content
-      const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>) => {
-        const result = event.target?.result;
-        if (typeof result === 'string') {
-          setSecretInfo(result);
-        }
-      };
-      reader.readAsText(file);
-    }
+  if (file) {
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+      const result = event.target?.result;
+      if (result instanceof ArrayBuffer) {
+        // Convert to base64 string for the FileData.data field
+        const base64 = Buffer.from(result).toString('base64');
+        setSecretInfo(base64);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
   };
 
   const handleCreateEntry = async () => {
@@ -47,7 +48,7 @@ export default function Page() {
     }
     setLoadingText('Uploading new entry...')
     let vaultHex = currentVaultId as`0x${string}`
-    const manifestInfo = await client?.upload(vaultHex, [fileData], litActionCid!, false);
+    const manifestInfo = await client?.upload(vaultHex, [fileData], false);
     setLoadingText('Retreiving new manifest...')
     const manifest = await client?.fetchManifest(manifestInfo?.manifestCid!);
     setVaultManifest(manifest!);
@@ -129,10 +130,18 @@ export default function Page() {
                   <input
                     type="file"
                     onChange={handleFileChange}
-                    className="input-field"
+                    className="hidden"
+                    id="file-upload"
                     accept=".txt,.json,.csv,.png,.jpeg,.gif"
                     key={selectedFile?.name || 'file-input'}
                   />
+                  <label
+                    htmlFor="file-upload"
+                    className="btn-secondary block cursor-pointer"
+                    style={{ width: '100%' }}
+                  >
+                    Choose File
+                  </label>
                   {selectedFile && (
                     <div className="file-info-box">
                       <p className="file-info-text">

@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { Fangorn } from 'fangorn';
 import { Address } from 'viem/accounts';
-import { getAddress } from 'viem';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -81,16 +80,6 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    // try {
-    //   const msg = `0x${Buffer.from("Hey sign in plz", "utf8").toString("hex")}`
-    //   const sign = await window.ethereum.request({
-    //     method: "personal_sign",
-    //     params: [msg, userAccount]
-    //   })
-    // } catch (err) {
-    //   console.error(err)
-    // }
-
       const rpcUrl = process.env.NEXT_PUBLIC_CHAIN_RPC_URL;
       const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
       const zkGateAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as Address;
@@ -101,6 +90,8 @@ export function FangornProvider({ children }: { children: ReactNode }) {
       console.log("requesting jwt")
       const jwtResponse = await fetch('/api/jwt');
       if (!jwtResponse.ok) throw new Error('Failed to fetch JWT');
+      const litActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
+      if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID; required');
       
       const { jwt } = await jwtResponse.json();
 
@@ -110,7 +101,8 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         rpcUrl, 
         zkGateAddress, 
         jwt, 
-        gateway
+        gateway,
+        litActionCid
       );
 
       console.log("Setting Client!");
