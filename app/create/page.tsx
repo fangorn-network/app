@@ -5,7 +5,7 @@ import { AppContext } from '../providers/vaultContextProvider';
 import { FangornContext } from '../providers/fangornProvider';
 export default function Page() {
   const { setVaultId } = useContext(AppContext);
-  const {client} = useContext(FangornContext);
+  const { client } = useContext(FangornContext);
   const [password, setPassword] = useState('');
   const [vaultName, setVaultName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,15 +21,14 @@ export default function Page() {
 
     const vaultId = await client?.createVault(vaultName, password);
 
-    console.log("vaultId: ", vaultId)
+    console.log('vaultId: ', vaultId);
 
     if (vaultId) {
       setVaultId(vaultId);
       router.push('/create/success');
     } else {
-      throw new Error("Vault Creation Failed");
+      throw new Error('Vault Creation Failed');
     }
-
   };
   return (
     <div>

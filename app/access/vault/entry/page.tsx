@@ -4,11 +4,11 @@ import { FangornContext } from '@/app/providers/fangornProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import { EntryContext } from '../layout';
-import circuit from "fangorn/circuits/preimage/target/preimage.json";
+import circuit from 'fangorn/circuits/preimage/target/preimage.json';
 
 export default function Page() {
   const { currentVaultId, currentVaultName } = useContext(AppContext);
-  const {selectedEntry} = useContext(EntryContext);
+  const { selectedEntry } = useContext(EntryContext);
   const { client } = useContext(FangornContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
@@ -16,25 +16,38 @@ export default function Page() {
 
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
-    
+
     try {
-      console.log('Decrypting and downloading:', selectedEntry?.tag, 'with password:', password, 'MIME type: ', selectedEntry?.fileType, 'and extension: ', selectedEntry?.extension);
-      
-      const decryptedContent = await client?.decryptFile(currentVaultId as`0x${string}`, selectedEntry?.tag!, password, circuit)
+      console.log(
+        'Decrypting and downloading:',
+        selectedEntry?.tag,
+        'with password:',
+        password,
+        'MIME type: ',
+        selectedEntry?.fileType,
+        'and extension: ',
+        selectedEntry?.extension
+      );
+
+      const decryptedContent = await client?.decryptFile(
+        currentVaultId as `0x${string}`,
+        selectedEntry?.tag!,
+        password,
+        circuit
+      );
       const dataString = new TextDecoder().decode(decryptedContent);
       let blob;
       if (selectedEntry?.fileType !== 'text/plain') {
-            // Decode base64 to binary
-            const binaryString = atob(dataString);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-              bytes[i] = binaryString.charCodeAt(i);
-            }
-            blob = new Blob([bytes], { type: selectedEntry?.fileType });
-
-        } else {
-            blob = new Blob([dataString], { type: selectedEntry?.fileType });
+        // Decode base64 to binary
+        const binaryString = atob(dataString);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
         }
+        blob = new Blob([bytes], { type: selectedEntry?.fileType });
+      } else {
+        blob = new Blob([dataString], { type: selectedEntry?.fileType });
+      }
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -42,7 +55,6 @@ export default function Page() {
       a.download = selectedEntry?.tag!;
       a.click();
       URL.revokeObjectURL(url);
-      
     } catch (error) {
       console.error('Decryption failed:', error);
     } finally {
@@ -84,32 +96,44 @@ export default function Page() {
 
           <div>
             <label className="form-label">CID:</label>
-            <div className="display-field-mono break-all">{selectedEntry.cid || 'N/A'}</div>
+            <div className="display-field-mono break-all">
+              {selectedEntry.cid || 'N/A'}
+            </div>
           </div>
 
           <div>
             <label className="form-label">Index:</label>
-            <div className="display-field">{selectedEntry.index !== undefined ? selectedEntry.index : 'N/A'}</div>
+            <div className="display-field">
+              {selectedEntry.index !== undefined ? selectedEntry.index : 'N/A'}
+            </div>
           </div>
 
           <div>
             <label className="form-label">Leaf:</label>
-            <div className="display-field-mono break-all">{selectedEntry.leaf || 'N/A'}</div>
+            <div className="display-field-mono break-all">
+              {selectedEntry.leaf || 'N/A'}
+            </div>
           </div>
 
           <div>
             <label className="form-label">Commitment:</label>
-            <div className="display-field-mono break-all">{selectedEntry.commitment || 'N/A'}</div>
+            <div className="display-field-mono break-all">
+              {selectedEntry.commitment || 'N/A'}
+            </div>
           </div>
 
           <div>
             <label className="form-label">Extension:</label>
-            <div className="display-field">{selectedEntry.extension || 'N/A'}</div>
+            <div className="display-field">
+              {selectedEntry.extension || 'N/A'}
+            </div>
           </div>
 
           <div>
             <label className="form-label">File Type:</label>
-            <div className="display-field">{selectedEntry.fileType || 'N/A'}</div>
+            <div className="display-field">
+              {selectedEntry.fileType || 'N/A'}
+            </div>
           </div>
 
           <div>
@@ -138,17 +162,11 @@ export default function Page() {
             )}
           </button>
 
-          <button
-            onClick={handleShareLink}
-            className="btn-secondary"
-          >
+          <button onClick={handleShareLink} className="btn-secondary">
             Share Link
           </button>
 
-          <button
-            onClick={handleBack}
-            className="btn-neutral"
-          >
+          <button onClick={handleBack} className="btn-neutral">
             Back
           </button>
         </div>

@@ -1,8 +1,14 @@
 'use client';
 
-import { createContext, useState, ReactNode, useContext, useCallback } from 'react';
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useContext,
+  useCallback,
+} from 'react';
 import { Vault } from 'fangorn/lib/interface/zkGate';
-import {VaultEntry, VaultManifest} from 'fangorn/lib/types/types.js';
+import { VaultEntry, VaultManifest } from 'fangorn/lib/types/types.js';
 
 type VaultContextType = {
   currentVaultId?: string;
@@ -33,7 +39,7 @@ export const AppContext = createContext<VaultContextType>({
   setVaults: () => {},
   setVault: () => undefined,
   setVaultManifest: () => undefined,
-  cleanupVaultContext: () => {}
+  cleanupVaultContext: () => {},
 });
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
@@ -50,10 +56,26 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setEntries([]);
     setVault(null);
     setVaultManifest(null);
-  }
+  };
 
   return (
-    <AppContext.Provider value={{ currentVaultId, setVaultId, currentVaultName, setVaultName, entries, setEntries, allVaults, setVaults, vault, setVault, manifest, setVaultManifest, cleanupVaultContext }}>
+    <AppContext.Provider
+      value={{
+        currentVaultId,
+        setVaultId,
+        currentVaultName,
+        setVaultName,
+        entries,
+        setEntries,
+        allVaults,
+        setVaults,
+        vault,
+        setVault,
+        manifest,
+        setVaultManifest,
+        cleanupVaultContext,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

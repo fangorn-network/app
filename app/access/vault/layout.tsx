@@ -12,7 +12,7 @@ interface EntryContextType {
 
 export const EntryContext = createContext<EntryContextType>({
   selectedEntry: null,
-  setSelectedEntry: () => {}
+  setSelectedEntry: () => {},
 });
 
 export default function StartLayout({
@@ -20,7 +20,7 @@ export default function StartLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [selectedEntry, setSelectedEntry] = useState<VaultEntry | null>(null)
+  const [selectedEntry, setSelectedEntry] = useState<VaultEntry | null>(null);
   const { currentVaultId } = useContext(AppContext);
   const router = useRouter();
 
@@ -46,5 +46,9 @@ export default function StartLayout({
     );
   }
 
-  return <EntryContext.Provider value = {{selectedEntry, setSelectedEntry}}>{children}</EntryContext.Provider>;
+  return (
+    <EntryContext.Provider value={{ selectedEntry, setSelectedEntry }}>
+      {children}
+    </EntryContext.Provider>
+  );
 }
