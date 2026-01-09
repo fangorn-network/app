@@ -23,7 +23,6 @@ export default function Page() {
       const decryptedContent = await client?.decryptFile(currentVaultId as`0x${string}`, selectedEntry?.tag!, password, circuit)
       const dataString = new TextDecoder().decode(decryptedContent);
       let blob;
-
       if (selectedEntry?.fileType !== 'text/plain') {
             // Decode base64 to binary
             const binaryString = atob(dataString);
