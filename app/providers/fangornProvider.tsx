@@ -1,8 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { createContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { Fangorn } from 'fangorn';
-import { Address } from 'viem/accounts';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -18,8 +17,8 @@ export const FangornContext = createContext<FangornContextType>({
   account: null,
   loading: true,
   error: null,
-  connect: () => new Promise((resolve) => {}),
-  disconnect: () => {},
+  connect: () => new Promise((resolve) => { }),
+  disconnect: () => { },
 });
 
 export function FangornProvider({ children }: { children: ReactNode }) {
@@ -39,8 +38,8 @@ export function FangornProvider({ children }: { children: ReactNode }) {
       if (!window.ethereum) {
         throw new Error('MetaMask is not installed');
       }
-      const [userAccount] = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
+      const [userAccount] = await window.ethereum.request({
+        method: 'eth_requestAccounts'
       });
 
       console.log("userAccount: ", userAccount);
@@ -78,32 +77,20 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         } else {
           throw switchError;
         }
-    }
+      }
 
-      const rpcUrl = process.env.NEXT_PUBLIC_CHAIN_RPC_URL;
       const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-      const zkGateAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as Address;
       console.log("importing env vars")
-      if (!rpcUrl) throw new Error('NEXT_PUBLIC_CHAIN_RPC_URL required');
       if (!gateway) throw new Error('NEXT_PUBLIC_PINATA_GATEWAY required');
-      if (!zkGateAddress) throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
       console.log("requesting jwt")
       const jwtResponse = await fetch('/api/jwt');
       if (!jwtResponse.ok) throw new Error('Failed to fetch JWT');
-      const litActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
-      if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID; required');
-      
+
       const { jwt } = await jwtResponse.json();
 
       console.log('Creating Fangorn client');
-      const fangornClient = await Fangorn.init(
-        userAccount, 
-        rpcUrl, 
-        zkGateAddress, 
-        jwt, 
-        gateway,
-        litActionCid
-      );
+      // let fangornClient = null;
+      const fangornClient = await Fangorn.init(userAccount, jwt, gateway);
 
       console.log("Setting Client!");
 

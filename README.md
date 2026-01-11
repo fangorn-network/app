@@ -1,17 +1,25 @@
-#Vault App
+# Vault App
 
 This app demonstrates the capabilities provided by the Fangorn SDK.
 
-## Pre-Req
+## Prerequisites
 
-1. run npm i
-2. Create a .env file with the fields:
+Install an EVM wallet compatible with base sepolia, e.g. the metamask browser extension.
+
+## Setup
+
+Copy .env.local and provide the pinata jwt fetched from https://app.pinata.cloud/developers/api-keys
+
+``` sh
 NEXT_PUBLIC_CHAIN_RPC_URL=https://base-sepolia-public.nodies.app
 NEXT_PUBLIC_PINATA_GATEWAY=https://gateway.pinata.cloud
-NEXT_PUBLIC_ZK_GATE_ADDR=
-NEXT_PUBLIC_LIT_ACTION_CID=
 PINATA_JWT=
+```
 
+
+``` sh
+npm i
+```
 
 ## Running the app
-To run the app simply run npm run dev
+Run with `npm run dev`. This starts the the app on localhost:3000.
