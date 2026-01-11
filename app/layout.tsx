@@ -45,11 +45,11 @@ export default function RootLayout({
   return (
     <FangornProvider>
       <AppContextProvider>
-          <html lang="en">
-            <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-              {children}
-            </body>
-          </html>
+        <html lang="en">
+          <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+            {children}
+          </body>
+        </html>
       </AppContextProvider>
     </FangornProvider>
   );

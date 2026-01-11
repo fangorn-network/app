@@ -4,7 +4,8 @@ This app demonstrates the capabilities provided by the Fangorn SDK.
 
 ## Prerequisites
 
-Install an EVM wallet compatible with base sepolia, e.g. the metamask browser extension.
+- Install an EVM wallet compatible with base sepolia, e.g. the metamask browser extension.
+- We recommend to use node version 22 (use nvm to install the specific version). The project fails to run with the latest version of node (v25).
 
 ## Setup
 
@@ -16,6 +17,7 @@ NEXT_PUBLIC_PINATA_GATEWAY=https://gateway.pinata.cloud
 PINATA_JWT=
 ```
 
+Install dependencies with NPM
 
 ``` sh
 npm i

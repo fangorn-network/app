@@ -27,14 +27,14 @@ export function FangornProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  console.log("Loading context");
+  console.log('Loading context');
 
   const connect = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log("connecting to wallet")
+      console.log('connecting to wallet');
       if (!window.ethereum) {
         throw new Error('MetaMask is not installed');
       }
@@ -42,7 +42,7 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         method: 'eth_requestAccounts'
       });
 
-      console.log("userAccount: ", userAccount);
+      console.log('userAccount: ', userAccount);
 
       const baseSepoliaChainId = '0x14a34';
 
@@ -92,7 +92,7 @@ export function FangornProvider({ children }: { children: ReactNode }) {
       // let fangornClient = null;
       const fangornClient = await Fangorn.init(userAccount, jwt, gateway);
 
-      console.log("Setting Client!");
+      console.log('Setting Client!');
 
       setClient(fangornClient);
       setAccount(userAccount);
@@ -116,7 +116,9 @@ export function FangornProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <FangornContext.Provider value={{ client, account, loading, error, connect, disconnect }}>
+    <FangornContext.Provider
+      value={{ client, account, loading, error, connect, disconnect }}
+    >
       {children}
     </FangornContext.Provider>
   );

@@ -6,7 +6,8 @@ import { FangornContext } from '@/app/providers/fangornProvider';
 import { Filedata } from 'fangorn/lib/types/types';
 
 export default function Page() {
-  const { currentVaultId, setEntries, setVaultManifest } = useContext(AppContext);
+  const { currentVaultId, setEntries, setVaultManifest } =
+    useContext(AppContext);
   const { client } = useContext(FangornContext);
   const [secretLabel, setSecretLabel] = useState('');
   const [secretInfo, setSecretInfo] = useState('');
@@ -18,19 +19,19 @@ export default function Page() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-  if (file) {
-    setSelectedFile(file);
-    const reader = new FileReader();
-    reader.onload = (event: ProgressEvent<FileReader>) => {
-      const result = event.target?.result;
-      if (result instanceof ArrayBuffer) {
-        // Convert to base64 string for the FileData.data field
-        const base64 = Buffer.from(result).toString('base64');
-        setSecretInfo(base64);
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  }
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const result = event.target?.result;
+        if (result instanceof ArrayBuffer) {
+          // Convert to base64 string for the FileData.data field
+          const base64 = Buffer.from(result).toString('base64');
+          setSecretInfo(base64);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   const handleCreateEntry = async () => {
@@ -39,25 +40,28 @@ export default function Page() {
     setIsCreatingEntry(true);
     if (uploadMode === 'text') {
       const data = secretInfo;
-      fileData = {tag, data, extension: ".txt", fileType: "text/plain"};
+      fileData = { tag, data, extension: '.txt', fileType: 'text/plain' };
     } else {
       const data = secretInfo;
-      const extension = selectedFile!.name.slice(selectedFile!.name.lastIndexOf('.'));
+      const extension = selectedFile!.name.slice(
+        selectedFile!.name.lastIndexOf('.')
+      );
       const fileType = selectedFile!.type;
-      fileData = {tag, data, extension, fileType};
+      fileData = { tag, data, extension, fileType };
     }
-    setLoadingText('Uploading new entry...')
-    let vaultHex = currentVaultId as`0x${string}`
+    setLoadingText('Uploading new entry...');
+    let vaultHex = currentVaultId as `0x${string}`;
     const manifestInfo = await client?.upload(vaultHex, [fileData], false);
-    setLoadingText('Retreiving new manifest...')
+    setLoadingText('Retreiving new manifest...');
     const manifest = await client?.fetchManifest(manifestInfo?.manifestCid!);
     setVaultManifest(manifest!);
     setEntries(manifest!.entries!);
-    setLoadingText('Complete!')
+    setLoadingText('Complete!');
     router.push('/access/vault/add/success');
   };
 
-  const isFormValid = (uploadMode === 'text' ? secretInfo : selectedFile) && secretLabel;
+  const isFormValid =
+    (uploadMode === 'text' ? secretInfo : selectedFile) && secretLabel;
 
   return (
     <div>
