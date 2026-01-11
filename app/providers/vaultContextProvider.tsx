@@ -9,18 +9,19 @@ import {
 } from 'react';
 import { Vault } from 'fangorn/lib/interface/zkGate';
 import { VaultEntry, VaultManifest } from 'fangorn/lib/types/types.js';
+import { Hex } from 'viem';
 
 type VaultContextType = {
   currentVaultId?: string;
   currentVaultName?: string;
-  allVaults?: string[];
+  allVaults?: VaultMetadata[];
   vault?: Vault | null;
   manifest?: VaultManifest | null;
   entries?: VaultEntry[];
   setVaultId: (state: string) => void;
   setVaultName: (state: string) => void;
   setEntries: (state: VaultEntry[]) => void;
-  setVaults: (state: string[]) => void;
+  setVaults: (state: VaultMetadata[]) => void;
   setVault: (state: Vault | null) => void;
   setVaultManifest: (state: VaultManifest | null) => void;
   cleanupVaultContext: () => void;
@@ -42,11 +43,16 @@ export const AppContext = createContext<VaultContextType>({
   cleanupVaultContext: () => {},
 });
 
+export interface VaultMetadata {
+  id: Hex;
+  name: string;
+}
+
 export function AppContextProvider({ children }: { children: ReactNode }) {
   const [currentVaultId, setVaultId] = useState('');
   const [currentVaultName, setVaultName] = useState('');
   const [entries, setEntries] = useState<VaultEntry[]>([]);
-  const [allVaults, setVaults] = useState(['']);
+  const [allVaults, setVaults] = useState<VaultMetadata[]>([]);
   const [vault, setVault] = useState<Vault | null>();
   const [manifest, setVaultManifest] = useState<VaultManifest | null>();
 

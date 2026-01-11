@@ -1,8 +1,9 @@
 'use client';
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppContext } from '../providers/vaultContextProvider';
+import { AppContext, VaultMetadata } from '../providers/vaultContextProvider';
 import { FangornContext } from '../providers/fangornProvider';
+import { Hex } from 'viem';
 
 export default function Page() {
   const { setVaultId, allVaults, setVaults } = useContext(AppContext);
@@ -14,8 +15,16 @@ export default function Page() {
     const loadVaults = async () => {
       try {
         setIsLoading(true);
-        const vaults = await client?.getUserVaults();
-        setVaults(vaults!);
+        // loads vaultIds that we own
+        let vaults: VaultMetadata[] = [];
+        const vaultIds = await client?.getUserVaults();
+        // load vault metadata (TODO - Q: is it better to query this per-vault, or to duplicate the vault name in storage?)
+        for (let vaultId of vaultIds!) {
+          let vaultIdHex = vaultId as Hex;
+          const vaultData = await client?.getVault(vaultIdHex);
+          vaults.push({ id: vaultIdHex, name: vaultData!.name })
+        }
+        setVaults(vaults);
       } catch (err) {
         console.error('Failed to load vaults:', err);
       } finally {
@@ -46,14 +55,14 @@ export default function Page() {
             <div className="space-y-4">
               {allVaults.map((vault) => (
                 <button
-                  key={vault}
+                  key={vault.id}
                   onClick={() => {
-                    setVaultId(vault);
+                    setVaultId(vault.id);
                     router.push('access/vault');
                   }}
                   className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="font-medium">{`Vault ${vault}`}</div>
+                  <div className="font-medium">{`${vault.name}`}</div>
                 </button>
               ))}
             </div>
