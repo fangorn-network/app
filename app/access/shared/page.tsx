@@ -1,18 +1,61 @@
 'use client';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { FangornContext } from '@/app/providers/fangornProvider';
-import { useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
-import { EntryContext } from '../layout';
-import { usePathname } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { VaultEntry } from 'fangorn/lib/types/types';
 
 export default function Page() {
-  const { currentVaultId, currentVaultName } = useContext(AppContext);
-  const { selectedEntry } = useContext(EntryContext);
-  const { client } = useContext(FangornContext);
+    // Route -> /access/shared/[vaultId]/[entryCid]
+  const params = useSearchParams();
+  const vaultId = params.get('vaultId');
+  const entryCid = params.get('entryId');
+  const { setVault, setVaultManifest, setVaultName, setVaultId, currentVaultId, currentVaultName, cleanupVaultContext } = useContext(AppContext);
+  const { client, loading } = useContext(FangornContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [sharedEntry, setSharedEntry] = useState<VaultEntry | null>(null);
+
+  useEffect( () => {
+
+    const loadVault = async() => {
+        if (!loading) {
+            console.log("Loading vault with Id: ", vaultId)
+            console.log("Loading entry with Id: ", entryCid)
+            setVaultId(vaultId!);
+            console.log("retreiving vault")
+            const vault = await client?.getVault(vaultId! as `0x${string}`);
+            setVaultName(vault?.name!);
+            console.log("vault: ", vault);
+            setVault(vault!);
+            console.log("retreiving manifest")
+            const manifest = await client?.fetchManifest(vault?.manifestCid!);
+            setVaultManifest(manifest!);
+            console.log("searching manifest for entry info")
+            const matchedEntry = manifest?.entries.filter(e => e.cid === entryCid);
+            if (matchedEntry) {
+                console.log("found entry")
+                setSharedEntry(matchedEntry[0]);
+                setIsLoading(false);
+            } else {
+                console.log("something went wrong")
+                setIsError(true);
+                setIsLoading(false);
+            }
+
+        } else {
+            console.log("Context is loading");
+        }
+
+    }
+    if (!sharedEntry && !isError && !loading) {
+        loadVault();
+    } 
+  }, [loading])
 
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
@@ -20,38 +63,38 @@ export default function Page() {
     try {
       console.log(
         'Decrypting and downloading:',
-        selectedEntry?.tag,
+        sharedEntry?.tag,
         'with password:',
         password,
         'MIME type: ',
-        selectedEntry?.fileType,
+        sharedEntry?.fileType,
         'and extension: ',
-        selectedEntry?.extension
+        sharedEntry?.extension
       );
 
       const decryptedContent = await client?.decryptFile(
         currentVaultId as `0x${string}`,
-        selectedEntry?.tag!,
+        sharedEntry?.tag!,
         password,
       );
       const dataString = new TextDecoder().decode(decryptedContent);
       let blob;
-      if (selectedEntry?.fileType !== 'text/plain') {
+      if (sharedEntry?.fileType !== 'text/plain') {
         // Decode base64 to binary
         const binaryString = atob(dataString);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
           bytes[i] = binaryString.charCodeAt(i);
         }
-        blob = new Blob([bytes], { type: selectedEntry?.fileType });
+        blob = new Blob([bytes], { type: sharedEntry?.fileType });
       } else {
-        blob = new Blob([dataString], { type: selectedEntry?.fileType });
+        blob = new Blob([dataString], { type: sharedEntry?.fileType });
       }
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = selectedEntry?.tag!;
+      a.download = sharedEntry?.tag!;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -62,19 +105,21 @@ export default function Page() {
     }
   };
 
-  const handleShareLink = () => {
-    // Add your share link logic here
-    const pathName = `https://localhost:3000/access/shared?vaultId=${currentVaultId}&entryId=${selectedEntry!.cid}`
-    console.log('Sharing link for:', selectedEntry);
-    alert(`Copy this link: ${pathName}`);
-    console.log(pathName);
-  };
+    useEffect(() => {
+    if (isError) {
+      const timer = setTimeout(() => {
+        router.push('/');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentVaultId, router]);
 
   const handleBack = () => {
-    router.push('/access/vault');
+    cleanupVaultContext();
+    router.push('/');
   };
 
-  if (!selectedEntry) {
+  if (isLoading) {
     return (
       <div className="screen-container">
         <div className="content-wrapper">
@@ -82,9 +127,22 @@ export default function Page() {
         </div>
       </div>
     );
-  }
+  } else if (isError) {
 
-  return (
+    return (
+      <div className="screen-container">
+        <div className="content-wrapper space-y-6">
+          <div className="spinner"></div>
+          <h2 className="section-title">
+            Entry not found. Redirecting home.
+          </h2>
+        </div>
+      </div>
+    );
+
+  } else {
+
+    return (
     <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
         <h2 className="section-title">{currentVaultName}</h2>
@@ -92,48 +150,48 @@ export default function Page() {
         <div className="card-lg space-y-4">
           <div>
             <label className="form-label">File Name:</label>
-            <div className="display-field">{selectedEntry.tag || 'N/A'}</div>
+            <div className="display-field">{sharedEntry!.tag || 'N/A'}</div>
           </div>
 
           <div>
             <label className="form-label">CID:</label>
             <div className="display-field-mono break-all">
-              {selectedEntry.cid || 'N/A'}
+              {sharedEntry!.cid || 'N/A'}
             </div>
           </div>
 
           <div>
             <label className="form-label">Index:</label>
             <div className="display-field">
-              {selectedEntry.index !== undefined ? selectedEntry.index : 'N/A'}
+              {sharedEntry!.index !== undefined ? sharedEntry!.index : 'N/A'}
             </div>
           </div>
 
           <div>
             <label className="form-label">Leaf:</label>
             <div className="display-field-mono break-all">
-              {selectedEntry.leaf || 'N/A'}
+              {sharedEntry!.leaf || 'N/A'}
             </div>
           </div>
 
           <div>
             <label className="form-label">Commitment:</label>
             <div className="display-field-mono break-all">
-              {selectedEntry.commitment || 'N/A'}
+              {sharedEntry!.commitment || 'N/A'}
             </div>
           </div>
 
           <div>
             <label className="form-label">Extension:</label>
             <div className="display-field">
-              {selectedEntry.extension || 'N/A'}
+              {sharedEntry!.extension || 'N/A'}
             </div>
           </div>
 
           <div>
             <label className="form-label">File Type:</label>
             <div className="display-field">
-              {selectedEntry.fileType || 'N/A'}
+              {sharedEntry!.fileType || 'N/A'}
             </div>
           </div>
 
@@ -163,15 +221,15 @@ export default function Page() {
             )}
           </button>
 
-          <button onClick={handleShareLink} className="btn-secondary">
-            Share Link
-          </button>
-
           <button onClick={handleBack} className="btn-neutral">
-            Back
+            Home
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+  }
+
+  

@@ -24,7 +24,7 @@ export const FangornContext = createContext<FangornContextType>({
 export function FangornProvider({ children }: { children: ReactNode }) {
   const [client, setClient] = useState<Fangorn | null>(null);
   const [account, setAccount] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   console.log('Loading context');
