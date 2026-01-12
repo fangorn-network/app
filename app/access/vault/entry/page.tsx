@@ -14,6 +14,8 @@ export default function Page() {
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
 
+  const [isVisible, setIsVisible] = useState(false);
+
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
 
@@ -64,10 +66,14 @@ export default function Page() {
 
   const handleShareLink = () => {
     // Add your share link logic here
-    const pathName = `https://localhost:3000/access/shared?vaultId=${currentVaultId}&entryId=${selectedEntry!.cid}`
-    console.log('Sharing link for:', selectedEntry);
-    alert(`Copy this link: ${pathName}`);
-    console.log(pathName);
+    const pathName = `http://localhost:3000/access/shared?vaultId=${currentVaultId}&entryId=${selectedEntry!.cid}`
+    navigator.clipboard.writeText(pathName)
+    // indicate we copied the message to the clipboard
+    setIsVisible(true);
+
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 5000);
   };
 
   const handleBack = () => {
@@ -149,7 +155,6 @@ export default function Page() {
             />
           </div>
         </div>
-
         <div className="space-y-3">
           <button
             onClick={handleDecryptAndDownload}
@@ -164,7 +169,7 @@ export default function Page() {
           </button>
 
           <button onClick={handleShareLink} className="btn-secondary">
-            Share Link
+            {isVisible ? 'Copied to clipboard' : 'Share Link'}
           </button>
 
           <button onClick={handleBack} className="btn-neutral">
