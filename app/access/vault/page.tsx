@@ -13,7 +13,6 @@ export default function Page() {
     setEntries,
     setVault,
     setVaultManifest,
-    vault,
     cleanupVaultContext,
     setVaultName,
     currentVaultName,
@@ -52,7 +51,7 @@ export default function Page() {
     if(isLoading) {
       loadVault();
     }
-  }, [vault, currentVaultId, client, setVaultName, setVault, setVaultManifest, setEntries, isLoading]);
+  });
 
 return (
     <div>
