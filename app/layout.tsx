@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Source_Code_Pro } from 'next/font/google';
-import { SafeArea } from '@coinbase/onchainkit/minikit';
 import { minikitConfig } from '../minikit.config';
-import { RootProvider } from './providers/rootProvider';
 import './globals.css';
 import { AppContextProvider } from './providers/vaultContextProvider';
 import { FangornProvider } from './providers/fangornProvider';

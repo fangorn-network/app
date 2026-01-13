@@ -17,11 +17,11 @@ export default function Page() {
       try {
         setIsLoading(true);
         // loads vaultIds that we own
-        let vaults: VaultMetadata[] = [];
+        const vaults: VaultMetadata[] = [];
         const vaultIds = await client?.getUserVaults();
         // load vault metadata (TODO - Q: is it better to query this per-vault, or to duplicate the vault name in storage?)
-        for (let vaultId of vaultIds!) {
-          let vaultIdHex = vaultId as Hex;
+        for (const vaultId of vaultIds!) {
+          const vaultIdHex = vaultId as Hex;
           const vaultData = await client?.getVault(vaultIdHex);
           vaults.push({ id: vaultIdHex, name: vaultData!.name })
         }
@@ -38,7 +38,7 @@ export default function Page() {
     } else {
       setIsLoading(false);
     }
-  }, [client]);
+  }, [client, setVaults]);
 
   return (
     <div>
@@ -82,7 +82,7 @@ export default function Page() {
           <div className="content-wrapper space-y-6">
             <h2 className="section-title">No Vaults Found</h2>
             <p className="text-gray-600 text-center">
-              You don't have any vaults yet. Create your first vault to get
+              You don&apos;t have any vaults yet. Create your first vault to get
               started.
             </p>
             <div className="btn-group">

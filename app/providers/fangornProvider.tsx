@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { Fangorn } from 'fangorn';
+import { Fangorn } from 'fangorn-sdk';
+import { ProviderRpcErrorCode } from 'viem';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -17,7 +18,7 @@ export const FangornContext = createContext<FangornContextType>({
   account: null,
   loading: true,
   error: null,
-  connect: () => new Promise((resolve) => { }),
+  connect: () => new Promise((_resolve) => { }),
   disconnect: () => { },
 });
 
@@ -51,9 +52,10 @@ export function FangornProvider({ children }: { children: ReactNode }) {
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: baseSepoliaChainId }],
         });
-      } catch (switchError: any) {
+      } catch (error) {
         // This error code indicates that the chain has not been added to MetaMask
-        if (switchError.code === 4902) {
+        const switchError = error as ProviderRpcErrorCode;
+        if (switchError === 4902) {
           try {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
@@ -72,6 +74,7 @@ export function FangornProvider({ children }: { children: ReactNode }) {
               ],
             });
           } catch (addError) {
+            console.log("Error: ", addError);
             throw new Error('Failed to add Base Sepolia network to MetaMask');
           }
         } else {

@@ -1,19 +1,10 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '../../providers/vaultContextProvider';
-import { VaultEntry } from 'fangorn/lib/types/types';
-
-interface EntryContextType {
-  selectedEntry: VaultEntry | null;
-  setSelectedEntry: (state: VaultEntry) => void;
-}
-
-export const EntryContext = createContext<EntryContextType>({
-  selectedEntry: null,
-  setSelectedEntry: () => {},
-});
+import { VaultEntry } from 'fangorn-sdk/lib/types/types';
+import { EntryContext } from './entryContext';
 
 export default function StartLayout({
   children,

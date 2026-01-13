@@ -4,11 +4,9 @@ import {
   createContext,
   useState,
   ReactNode,
-  useContext,
-  useCallback,
 } from 'react';
-import { Vault } from 'fangorn/lib/interface/zkGate';
-import { VaultEntry, VaultManifest } from 'fangorn/lib/types/types.js';
+import { Vault } from 'fangorn-sdk/lib/interface/zkGate';
+import { VaultEntry, VaultManifest } from 'fangorn-sdk/lib/types/types.js';
 import { Hex } from 'viem';
 
 type VaultContextType = {

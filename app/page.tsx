@@ -46,9 +46,8 @@
 // }
 'use client';
 
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 // show waitlist if we are in prod
 const env = process.env.NODE_ENV;
@@ -124,7 +123,7 @@ return (
             {submitted ? (
               <div className="success">
                 <span>✓</span>
-                <span>You're on the list.</span>
+                <span>You&apos;re on the list.</span>
               </div>
             ) : (
               <form onSubmit={handleWaitlistSubmit} className="signup">

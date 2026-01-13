@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { FangornContext } from '@/app/providers/fangornProvider';
-import { Filedata } from 'fangorn/lib/types/types';
+import { Filedata } from 'fangorn-sdk/lib/types/types';
 
 export default function Page() {
   const { currentVaultId, setEntries, setVaultManifest } =
@@ -50,14 +50,29 @@ export default function Page() {
       fileData = { tag, data, extension, fileType };
     }
     setLoadingText('Uploading new entry...');
-    let vaultHex = currentVaultId as `0x${string}`;
+    const vaultHex = currentVaultId as `0x${string}`;
     const manifestInfo = await client?.upload(vaultHex, [fileData], false);
-    setLoadingText('Retreiving new manifest...');
-    const manifest = await client?.fetchManifest(manifestInfo?.manifestCid!);
-    setVaultManifest(manifest!);
-    setEntries(manifest!.entries!);
-    setLoadingText('Complete!');
-    router.push('/access/vault/add/success');
+    if (!manifestInfo) {
+      router.push('/access/vault')
+    } else {
+      setLoadingText('Retreiving new manifest...');
+      if (!client) {
+        router.push('/')
+      } else {
+        const manifest = await client.fetchManifest(manifestInfo.manifestCid!);
+        if (!manifest) {
+          // TODO: Display error saying something went wrong with manifest retrieval
+          router.push('/access/vault')
+        } else {
+          setVaultManifest(manifest);
+          setEntries(manifest.entries);
+          setLoadingText('Complete!');
+          router.push('/access/vault/add/success');
+        }
+
+      }
+
+    }
   };
 
   const isFormValid =
