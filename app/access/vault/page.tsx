@@ -49,12 +49,10 @@ export default function Page() {
       }
       setIsLoading(false);
     };
-    if (vault) {
-      setIsLoading(false);
-    } else {
+    if(isLoading) {
       loadVault();
     }
-  }, [vault, currentVaultId, client, setVaultName, setVault, setVaultManifest, setEntries]);
+  }, [vault, currentVaultId, client, setVaultName, setVault, setVaultManifest, setEntries, isLoading]);
 
 return (
     <div>
