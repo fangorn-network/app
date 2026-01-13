@@ -66,6 +66,26 @@
     gap: 20px;
   }
 
+  .testnet-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #fbbf24;
+    letter-spacing: 0.02em;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .testnet-banner-icon {
+    font-size: 12px;
+  }
+
   .app-logo {
     display: flex;
     align-items: center;

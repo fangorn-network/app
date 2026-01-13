@@ -96,12 +96,12 @@ return (
                 >
                   Add
                 </button>
-                <button
+                {/* <button
                   onClick={() => alert('Export functionality coming soon')}
                   className="btn-secondary"
                 >
                   Export
-                </button>
+                </button> */}
                 <button onClick={handleCloseVault} className="btn-neutral">
                   Close
                 </button>

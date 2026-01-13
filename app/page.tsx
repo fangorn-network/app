@@ -50,9 +50,8 @@ import { useMiniKit } from '@coinbase/onchainkit/minikit';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-// show waitlist if we are in prod
-const env = process.env.NODE_ENV;
-const WAITLIST_ENABLED = env === "production";
+// show waitlist if we are not running on testnet
+const WAITLIST_ENABLED = !process.env.NEXT_PUBLIC_CHAIN_RPC_URL!.includes("sepolia");
 
 export default function BaseVaultApp() {
   const router = useRouter();
@@ -103,6 +102,12 @@ export default function BaseVaultApp() {
 return (
     <div className="app">
       <main className="app-main">
+         {!WAITLIST_ENABLED && (
+          <div className="testnet-banner">
+            <span className="testnet-banner-icon">⚠</span>
+            <span>testnet only — data may be purged</span>
+          </div>
+        )}
        <div className="app-header">
           <h1 className="app-title">
             fangorn<span className="app-title-accent">://</span>vault
