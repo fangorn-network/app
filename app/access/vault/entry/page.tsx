@@ -65,8 +65,15 @@ export default function Page() {
   };
 
   const handleShareLink = () => {
-    // Add your share link logic here
-    const pathName = `http://localhost:3000/access/shared?vaultId=${currentVaultId}&entryId=${selectedEntry!.cid}`
+
+    const ROOT_URL =
+      process.env.NEXT_PUBLIC_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : 'http://localhost:3000');
+    
+
+    const pathName = `${ROOT_URL}/access/shared?vaultId=${currentVaultId}&entryId=${selectedEntry!.cid}`
     navigator.clipboard.writeText(pathName)
     // indicate we copied the message to the clipboard
     setIsVisible(true);

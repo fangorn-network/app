@@ -61,7 +61,7 @@ export default function Page() {
                     setVaultId(vault.id);
                     router.push('access/vault');
                   }}
-                  className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full p-4 text-left border rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   <div className="font-medium">{`${vault.name}`}</div>
                 </button>

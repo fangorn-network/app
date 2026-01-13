@@ -1,147 +1,158 @@
-'use client';
+// 'use client';
 
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+// import { useMiniKit } from '@coinbase/onchainkit/minikit';
+// import { useRouter } from 'next/navigation';
+// import { useEffect } from 'react';
 
-export default function BaseVaultApp() {
-  // const { isMiniAppReady, setMiniAppReady } = useMiniKit();
-  // Initialize the miniapp
-  // useEffect(() => {
-  //   if (!isMiniAppReady) {
-  //     setMiniAppReady();
-  //   }
-  // }, [setMiniAppReady, isMiniAppReady]);
-  const router = useRouter();
-  return (
-    <div className="screen-container">
-      <div className="content-wrapper space-y-8">
-        <div className="text-center">
-          <h1 className="page-title">Fangorn Vault</h1>
-          <p className="subtitle">Secure data storage on Base</p>
-        </div>
-
-        <div className="space-y-4">
-          <button
-            onClick={() => {
-              router.push('/create');
-            }}
-            className="btn-primary-lg"
-          >
-            Create Vault
-          </button>
-
-          <button
-            onClick={() => {
-              router.push('/access');
-            }}
-            className="btn-secondary-lg"
-          >
-            Access Vault
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// export default function Home() {
-//   const { isFrameReady, setFrameReady, context } = useMiniKit();
-//   const [email, setEmail] = useState("");
-//   const [error, setError] = useState("");
+// export default function BaseVaultApp() {
+//   // const { isMiniAppReady, setMiniAppReady } = useMiniKit();
+//   // Initialize the miniapp
+//   // useEffect(() => {
+//   //   if (!isMiniAppReady) {
+//   //     setMiniAppReady();
+//   //   }
+//   // }, [setMiniAppReady, isMiniAppReady]);
 //   const router = useRouter();
-
-//   // Initialize the  miniapp
-//   useEffect(() => {
-//     if (!isFrameReady) {
-//       setFrameReady();
-//     }
-//   }, [setFrameReady, isFrameReady]);
-
-//   // If you need to verify the user's identity, you can use the useQuickAuth hook.
-//   // This hook will verify the user's signature and return the user's FID. You can update
-//   // this to meet your needs. See the /app/api/auth/route.ts file for more details.
-//   // Note: If you don't need to verify the user's identity, you can get their FID and other user data
-//   // via `context.user.fid`.
-//   // const { data, isLoading, error } = useQuickAuth<{
-//   //   userFid: string;
-//   // }>("/api/auth");
-
-//   const { data: authData, isLoading: isAuthLoading, error: authError } = useQuickAuth<AuthResponse>(
-//     "/api/auth",
-//     { method: "GET" }
-//   );
-
-//   const validateEmail = (email: string) => {
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     return emailRegex.test(email);
-//   };
-
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setError("");
-
-//     // Check authentication first
-//     if (isAuthLoading) {
-//       setError("Please wait while we verify your identity...");
-//       return;
-//     }
-
-//     if (authError || !authData?.success) {
-//       setError("Please authenticate to join the waitlist");
-//       return;
-//     }
-
-//     if (!email) {
-//       setError("Please enter your email address");
-//       return;
-//     }
-
-//     if (!validateEmail(email)) {
-//       setError("Please enter a valid email address");
-//       return;
-//     }
-
-//     // TODO: Save email to database/API with user FID
-//     console.log("Valid email submitted:", email);
-//     console.log("User authenticated:", authData.user);
-
-//     // Navigate to success page
-//     router.push("/success");
-//   };
-
 //   return (
-//     <div className={styles.container}>
-//       <button className={styles.closeButton} type="button">
-//         ✕
-//       </button>
+//     <div className="screen-container">
+//       <div className="content-wrapper space-y-8">
+//         <div className="text-center">
+//           <h1 className="page-title">Fangorn Vault</h1>
+//           <p className="subtitle">Secure data storage on Base</p>
+//         </div>
 
-//       <div className={styles.content}>
-//         <div className={styles.waitlistForm}>
-//           <h1 className={styles.title}>Join {minikitConfig.miniapp.name.toUpperCase()}</h1>
+//         <div className="space-y-4">
+//           <button
+//             onClick={() => {
+//               router.push('/create');
+//             }}
+//             className="btn-primary-lg"
+//           >
+//             Create Vault
+//           </button>
 
-//           <p className={styles.subtitle}>
-//              Hey {context?.user?.displayName || "there"}, Get early access and be the first to experience the future of<br />
-//             crypto marketing strategy.
-//           </p>
-
-//           <form onSubmit={handleSubmit} className={styles.form}>
-//             <input
-//               type="email"
-//               placeholder="Your amazing email"
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               className={styles.emailInput}
-//             />
-
-//             {error && <p className={styles.error}>{error}</p>}
-
-//             <button type="submit" className={styles.joinButton}>
-//               JOIN WAITLIST
-//             </button>
-//           </form>
+//           <button
+//             onClick={() => {
+//               router.push('/access');
+//             }}
+//             className="btn-secondary-lg"
+//           >
+//             Access Vault
+//           </button>
 //         </div>
 //       </div>
 //     </div>
 //   );
 // }
+'use client';
+
+import { useMiniKit } from '@coinbase/onchainkit/minikit';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+// show waitlist if we are in prod
+const env = process.env.NODE_ENV;
+const WAITLIST_ENABLED = env === "production";
+
+export default function BaseVaultApp() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleWaitlistSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_WAITLIST_URL!;
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // required for Google Apps Script
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      }).then(() => setSubmitted(true));
+      // With no-cors we can't read the response, but if it didn't throw, assume success
+    } catch (err) {
+      console.error('Waitlist signup error:', err);
+      setError('Something went wrong. Please try again.');
+    }
+    
+    setSubmitted(true);
+  };
+
+  // Waitlist UI
+return (
+    <div className="app">
+      <main className="app-main">
+       <div className="app-header">
+          <h1 className="app-title">
+            fangorn<span className="app-title-accent">://</span>vault
+          </h1>
+          <div className="app-tags">
+            <span className="app-tag">
+              <span className="app-tag-dot" />
+              base sepolia
+            </span>
+            <span className="app-tag-separator">/</span>
+            <span className="app-tag">
+              <span className="app-tag-dot" />
+              lit protocol
+            </span>
+          </div>
+        </div>
+        {WAITLIST_ENABLED ? (
+          <div className="app-content">
+            {submitted ? (
+              <div className="success">
+                <span>✓</span>
+                <span>You're on the list.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWaitlistSubmit} className="signup">
+                <input
+                  type="email"
+                  placeholder="you@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="signup-input"
+                />
+                <button type="submit" className="signup-button">
+                  JOIN
+                </button>
+              </form>
+            )}
+            {error && <p className="error">{error}</p>}
+          </div>
+        ) : (
+          <div className="app-content">
+            <button onClick={() => router.push('/create')} className="btn-primary-lg">
+              Create Vault
+            </button>
+            <button onClick={() => router.push('/access')} className="btn-secondary-lg">
+              Access Vault
+            </button>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

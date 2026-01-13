@@ -56,54 +56,58 @@ export default function Page() {
     }
   });
 
-  return (
+return (
     <div>
       {isLoading ? (
-        <div className="screen-container">
-          <div className="content-wrapper space-y-6">
-            <div className="spinner"></div>
-            <h2 className="section-title">{loadingText}</h2>
-          </div>
+        <div className="loading-container">
+          <div className="spinner" />
+          <span className="loading-text">{loadingText}</span>
         </div>
       ) : (
-        <div className="screen-container-top">
-          <div className="content-wrapper space-y-6">
-            <h2 className="section-title">Your Vault: {currentVaultName}</h2>
+        <div className="app">
+          <main className="app-main">
+            <div className="app-content" style={{ maxWidth: '400px' }}>
+              <div className="vault-header">
+                <span className="vault-title">vault://{currentVaultName}</span>
+                <span className="vault-name">{entries?.length || 0} entries</span>
+              </div>
 
-            <div className="card space-y-2">
-              {entries?.length === 0 ? (
-                <p className="empty-state">No secrets stored yet</p>
-              ) : (
-                entries?.map((entry, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleEntryClick(entry)}
-                    className="secret-item"
-                  >
-                    <div className="secret-item-label">{entry.tag}</div>
-                  </button>
-                ))
-              )}
-            </div>
+              <div className="vault-entries">
+                {entries?.length === 0 ? (
+                  <div className="vault-empty">no entries yet</div>
+                ) : (
+                  entries?.map((entry, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleEntryClick(entry)}
+                      className="vault-entry"
+                    >
+                      <span className="vault-entry-icon">→</span>
+                      <span>{entry.tag}</span>
+                    </button>
+                  ))
+                )}
+              </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={() => router.push('/access/vault/add')}
-                className="btn-primary"
-              >
-                Add
-              </button>
-              <button
-                onClick={() => alert('Export functionality coming soon')}
-                className="btn-secondary"
-              >
-                Export
-              </button>
-              <button onClick={handleCloseVault} className="btn-neutral">
-                Close
-              </button>
+              <div className="vault-actions">
+                <button
+                  onClick={() => router.push('/access/vault/add')}
+                  className="btn-primary"
+                >
+                  Add
+                </button>
+                <button
+                  onClick={() => alert('Export functionality coming soon')}
+                  className="btn-secondary"
+                >
+                  Export
+                </button>
+                <button onClick={handleCloseVault} className="btn-neutral">
+                  Close
+                </button>
+              </div>
             </div>
-          </div>
+          </main>
         </div>
       )}
     </div>
