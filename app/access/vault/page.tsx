@@ -3,8 +3,8 @@ import { FangornContext } from '@/app/providers/fangornProvider';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { EntryContext } from './layout';
-import { VaultEntry } from 'fangorn/lib/types/types';
+import { EntryContext } from './entryContext';
+import { VaultEntry } from 'fangorn-sdk/lib/types/types';
 
 export default function Page() {
   const {
@@ -37,7 +37,7 @@ export default function Page() {
   useEffect(() => {
     const loadVault = async () => {
       setLoadingText('Loading vault...');
-      let vaultHex = currentVaultId as `0x${string}`;
+      const vaultHex = currentVaultId as `0x${string}`;
       const vault = await client?.getVault(vaultHex!);
       setVaultName(vault!.name);
       setVault(vault!);
@@ -54,7 +54,7 @@ export default function Page() {
     } else {
       loadVault();
     }
-  });
+  }, [vault, currentVaultId, client, setVaultName, setVault, setVaultManifest, setEntries]);
 
 return (
     <div>

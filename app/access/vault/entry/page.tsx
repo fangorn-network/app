@@ -3,8 +3,7 @@ import { AppContext } from '@/app/providers/vaultContextProvider';
 import { FangornContext } from '@/app/providers/fangornProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
-import { EntryContext } from '../layout';
-import { usePathname } from 'next/navigation'
+import { EntryContext } from '../entryContext';
 
 export default function Page() {
   const { currentVaultId, currentVaultName } = useContext(AppContext);
@@ -19,6 +18,8 @@ export default function Page() {
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
 
+
+
     try {
       console.log(
         'Decrypting and downloading:',
@@ -31,9 +32,12 @@ export default function Page() {
         selectedEntry?.extension
       );
 
-      const decryptedContent = await client?.decryptFile(
+      if(!selectedEntry) {
+        router.push('/access/vault')
+      } else {
+        const decryptedContent = await client?.decryptFile(
         currentVaultId as `0x${string}`,
-        selectedEntry?.tag!,
+        selectedEntry.tag,
         password,
       );
       const dataString = new TextDecoder().decode(decryptedContent);
@@ -53,9 +57,11 @@ export default function Page() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = selectedEntry?.tag!;
+      a.download = selectedEntry.tag;
       a.click();
       URL.revokeObjectURL(url);
+
+      }
     } catch (error) {
       console.error('Decryption failed:', error);
     } finally {
