@@ -28,8 +28,6 @@ export function FangornProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  console.log('Loading context');
-
   const connect = useCallback(async () => {
     setLoading(true);
     setError(null);
