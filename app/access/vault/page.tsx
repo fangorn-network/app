@@ -2,7 +2,7 @@
 import { FangornContext } from '@/app/providers/fangornProvider';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { EntryContext } from './entryContext';
 import { VaultEntry } from 'fangorn-sdk/lib/types/types';
 
@@ -33,25 +33,30 @@ export default function Page() {
     router.push('/access/vault/entry');
   };
 
-  useEffect(() => {
-    const loadVault = async () => {
-      setLoadingText('Loading vault...');
-      const vaultHex = currentVaultId as `0x${string}`;
-      const vault = await client?.getVault(vaultHex!);
-      setVaultName(vault!.name);
-      setVault(vault!);
-      if (vault?.manifestCid) {
-        setLoadingText('Loading manifest...');
-        const manifest = await client?.fetchManifest(vault.manifestCid);
-        setVaultManifest(manifest!);
-        setEntries(manifest!.entries!);
-      }
-      setIsLoading(false);
-    };
-    if(isLoading) {
-      loadVault();
+const hasLoadedRef = useRef(false);
+
+useEffect(() => {
+  if (hasLoadedRef.current || !client || !currentVaultId || !isLoading) return;
+  
+  hasLoadedRef.current = true;
+  
+  const loadVault = async () => {
+    setLoadingText('Loading vault...');
+    const vaultHex = currentVaultId as `0x${string}`;
+    const vault = await client.getVault(vaultHex);
+    setVaultName(vault.name);
+    setVault(vault);
+    if (vault?.manifestCid) {
+      setLoadingText('Loading manifest...');
+      const manifest = await client.fetchManifest(vault.manifestCid);
+      setVaultManifest(manifest);
+      setEntries(manifest.entries);
     }
-  });
+    setIsLoading(false);
+  };
+  
+  loadVault();
+}, [client, currentVaultId, isLoading, setVaultName, setVault, setVaultManifest, setEntries]);
 
 return (
     <div>
