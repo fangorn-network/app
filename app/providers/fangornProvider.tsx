@@ -77,7 +77,7 @@ export function FangornProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [account]);
+  }, [account, WalletError, chain, walletClient]);
 
   // Initialize Fangorn client when account is available
   useEffect(() => {

@@ -98,18 +98,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 				chain: baseSepolia,
 			});
 
-    // const siweMessageOverrides: WalletClientAuthenticator = {
-		// 	domain: DOMAIN,
-		// 	statement: "This is the statement",
-		// };
-		// const messageToSign = "Please sign in to enable LIT functionality.";
-
-		// await WalletClientAuthenticator.authenticate(
-		// 	walletClient,
-		// 	messageToSign,
-		// 	siweMessageOverrides,
-		// );
-
       setWalletClient(walletClient);
       setChain(baseSepolia);
       setAccount(userAccount);
