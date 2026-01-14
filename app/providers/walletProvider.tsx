@@ -1,9 +1,7 @@
 'use client';
 
 import { createContext, useState, useCallback, ReactNode, useEffect, useContext } from 'react';
-import { AppConfig, Fangorn } from 'fangorn-sdk';
 import { ProviderRpcErrorCode } from 'viem';
-import { baseSepolia } from 'viem/chains';
 
 // ========== Wallet Provider ==========
 
