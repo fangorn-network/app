@@ -5,6 +5,7 @@ import './globals.css';
 import { AppContextProvider } from './providers/vaultContextProvider';
 import { FangornProvider } from './providers/fangornProvider';
 import { WalletProvider } from './providers/walletProvider';
+import { ErrorProvider } from './providers/errorContextProvider';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -42,16 +43,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <WalletProvider>
-      <FangornProvider>
-        <AppContextProvider>
-          <html lang="en">
-            <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-              {children}
-            </body>
-          </html>
-        </AppContextProvider>
-      </FangornProvider>
-    </WalletProvider>
+    <html lang="en">
+      <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+        <ErrorProvider>
+          <WalletProvider>
+            <FangornProvider>
+              <AppContextProvider>
+                    {children}
+              </AppContextProvider>
+            </FangornProvider>
+          </WalletProvider>
+        </ErrorProvider>
+      </body>
+    </html>
+    
   );
 }
