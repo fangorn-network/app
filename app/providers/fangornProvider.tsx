@@ -1,8 +1,9 @@
 'use client';
 
 import { createContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { Fangorn } from 'fangorn-sdk';
+import { AppConfig, Fangorn } from 'fangorn-sdk';
 import { ProviderRpcErrorCode } from 'viem';
+import { baseSepolia } from 'viem/chains';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -91,7 +92,15 @@ export function FangornProvider({ children }: { children: ReactNode }) {
 
       console.log('Creating Fangorn client');
       // let fangornClient = null;
-      const fangornClient = await Fangorn.init(userAccount, jwt, gateway);
+      const litActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
+      if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID required');
+      const circuitJsonCid = process.env.NEXT_PUBLIC_CIRCUIT_JSON_CID;
+      if (!circuitJsonCid) throw new Error('NEXT_PUBLIC_CIRCUIT_JSON_CID required');
+      const zkGateContractAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as `0x${string}`;
+      if (!zkGateContractAddress) throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
+
+      const fangornConfig: AppConfig = {litActionCid, circuitJsonCid, zkGateContractAddress, chain: baseSepolia, chainName: "baseSepolia", rpcUrl: "https://sepolia.base.org"}
+      const fangornClient = await Fangorn.init(userAccount, jwt, gateway, fangornConfig);
 
       console.log('Setting Client!');
 
