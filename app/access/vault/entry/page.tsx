@@ -1,6 +1,6 @@
 'use client';
 import { AppContext } from '@/app/providers/vaultContextProvider';
-import { FangornContext } from '@/app/providers/fangornProvider';
+import { useFangorn } from '@/app/providers/fangornProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import { EntryContext } from '../entryContext';
@@ -8,7 +8,7 @@ import { EntryContext } from '../entryContext';
 export default function Page() {
   const { currentVaultId, currentVaultName } = useContext(AppContext);
   const { selectedEntry } = useContext(EntryContext);
-  const { client } = useContext(FangornContext);
+  const { client } = useFangorn();
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);

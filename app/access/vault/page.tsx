@@ -1,5 +1,5 @@
 'use client';
-import { FangornContext } from '@/app/providers/fangornProvider';
+import { useFangorn } from '@/app/providers/fangornProvider';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -18,7 +18,7 @@ export default function Page() {
     currentVaultName,
   } = useContext(AppContext);
   const { setSelectedEntry } = useContext(EntryContext);
-  const { client } = useContext(FangornContext);
+  const { client } = useFangorn();
   const [isLoading, setIsLoading] = useState(true);
   const [loadingText, setLoadingText] = useState('');
   const router = useRouter();

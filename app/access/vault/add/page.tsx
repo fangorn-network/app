@@ -2,13 +2,13 @@
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/app/providers/vaultContextProvider';
-import { FangornContext } from '@/app/providers/fangornProvider';
+import { useFangorn } from '@/app/providers/fangornProvider';
 import { Filedata } from 'fangorn-sdk/lib/types/types';
 
 export default function Page() {
   const { currentVaultId, setEntries, setVaultManifest } =
     useContext(AppContext);
-  const { client } = useContext(FangornContext);
+  const { client } = useFangorn();
   const [secretLabel, setSecretLabel] = useState('');
   const [secretInfo, setSecretInfo] = useState('');
   const [uploadMode, setUploadMode] = useState('text'); // 'text' or 'file'

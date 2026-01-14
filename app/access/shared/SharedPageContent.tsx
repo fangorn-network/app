@@ -1,6 +1,6 @@
 'use client';
 import { AppContext } from '@/app/providers/vaultContextProvider';
-import { FangornContext } from '@/app/providers/fangornProvider';
+import { useFangorn } from '@/app/providers/fangornProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { VaultEntry } from 'fangorn-sdk/lib/types/types';
@@ -11,7 +11,7 @@ export default function SharedPageContent() {
   const vaultId = params.get('vaultId');
   const entryCid = params.get('entryId');
   const { setVault, setVaultManifest, setVaultName, setVaultId, currentVaultId, currentVaultName, cleanupVaultContext } = useContext(AppContext);
-  const { client, loading } = useContext(FangornContext);
+  const { client, loading } = useFangorn();
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);

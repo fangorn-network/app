@@ -2,10 +2,10 @@
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '../providers/vaultContextProvider';
-import { FangornContext } from '../providers/fangornProvider';
+import { useFangorn } from '../providers/fangornProvider';
 export default function Page() {
   const { setVaultId } = useContext(AppContext);
-  const { client } = useContext(FangornContext);
+  const { client } = useFangorn();
   const [password, setPassword] = useState('');
   const [vaultName, setVaultName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

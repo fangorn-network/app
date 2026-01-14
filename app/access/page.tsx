@@ -2,12 +2,12 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext, VaultMetadata } from '../providers/vaultContextProvider';
-import { FangornContext } from '../providers/fangornProvider';
+import { useFangorn } from '../providers/fangornProvider';
 import { Hex } from 'viem';
 
 export default function Page() {
   const { setVaultId, allVaults, setVaults } = useContext(AppContext);
-  const { client } = useContext(FangornContext);
+  const { client } = useFangorn();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 

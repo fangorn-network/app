@@ -1,135 +1,89 @@
 'use client';
 
-import { createContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { AppConfig, Fangorn } from 'fangorn-sdk';
-import { ProviderRpcErrorCode } from 'viem';
+import { useWallet } from './walletProvider';
 import { baseSepolia } from 'viem/chains';
 
 interface FangornContextType {
   client: Fangorn | null;
-  account: string | null;
   loading: boolean;
   error: Error | null;
-  connect: () => Promise<void>;
-  disconnect: () => void;
 }
 
-export const FangornContext = createContext<FangornContextType>({
+const FangornContext = createContext<FangornContextType>({
   client: null,
-  account: null,
   loading: true,
   error: null,
-  connect: () => new Promise((_resolve) => { }),
-  disconnect: () => { },
 });
 
 export function FangornProvider({ children }: { children: ReactNode }) {
+  const { account } = useWallet();
   const [client, setClient] = useState<Fangorn | null>(null);
-  const [account, setAccount] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const connect = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    if (!account) {
+      setClient(null);
+      setLoading(false);
+      return;
+    }
 
-    try {
-      console.log('connecting to wallet');
-      if (!window.ethereum) {
-        throw new Error('MetaMask is not installed');
-      }
-      const [userAccount] = await window.ethereum.request({
-        method: 'eth_requestAccounts'
-      });
-
-      console.log('userAccount: ', userAccount);
-
-      const baseSepoliaChainId = '0x14a34';
+    const initializeFangorn = async () => {
+      setLoading(true);
+      setError(null);
 
       try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: baseSepoliaChainId }],
-        });
-      } catch (error) {
-        // This error code indicates that the chain has not been added to MetaMask
-        const switchError = error as ProviderRpcErrorCode;
-        if (switchError === 4902) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: baseSepoliaChainId,
-                  chainName: 'Base Sepolia',
-                  nativeCurrency: {
-                    name: 'Ether',
-                    symbol: 'ETH',
-                    decimals: 18,
-                  },
-                  rpcUrls: [process.env.NEXT_PUBLIC_CHAIN_RPC_URL],
-                  blockExplorerUrls: ['https://sepolia.basescan.org'],
-                },
-              ],
-            });
-          } catch (addError) {
-            console.log("Error: ", addError);
-            throw new Error('Failed to add Base Sepolia network to MetaMask');
-          }
-        } else {
-          throw switchError;
-        }
+        console.log('Initializing Fangorn client');
+
+        const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+        if (!gateway) throw new Error('NEXT_PUBLIC_PINATA_GATEWAY required');
+
+        // TODO: JWT doesn't need to be passed around
+        const jwt = process.env.NEXT_PUBLIC_PINATA_JWT;
+        if (!jwt) throw new Error('NEXT_PUBLIC_PINATA_JWT required');
+
+        const litActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
+        if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID required');
+
+        const circuitJsonCid = process.env.NEXT_PUBLIC_CIRCUIT_JSON_CID;
+        if (!circuitJsonCid) throw new Error('NEXT_PUBLIC_CIRCUIT_JSON_CID required');
+
+        const zkGateContractAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as `0x${string}`;
+        if (!zkGateContractAddress) throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
+
+        const fangornConfig: AppConfig = {
+          litActionCid,
+          circuitJsonCid,
+          zkGateContractAddress,
+          chain: baseSepolia,
+          chainName: 'baseSepolia',
+          rpcUrl: 'https://sepolia.base.org',
+        };
+
+        const fangornClient = await Fangorn.init(account as `0x${string}`, jwt, gateway, fangornConfig);
+
+        console.log('Fangorn client initialized');
+        setClient(fangornClient);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+        console.error('Fangorn initialization error:', err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-      console.log("importing env vars")
-      if (!gateway) throw new Error('NEXT_PUBLIC_PINATA_GATEWAY required');
-      console.log("requesting jwt")
-      const jwtResponse = await fetch('/api/jwt');
-      if (!jwtResponse.ok) throw new Error('Failed to fetch JWT');
-
-      const { jwt } = await jwtResponse.json();
-
-      console.log('Creating Fangorn client');
-      // let fangornClient = null;
-      const litActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
-      if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID required');
-      const circuitJsonCid = process.env.NEXT_PUBLIC_CIRCUIT_JSON_CID;
-      if (!circuitJsonCid) throw new Error('NEXT_PUBLIC_CIRCUIT_JSON_CID required');
-      const zkGateContractAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as `0x${string}`;
-      if (!zkGateContractAddress) throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
-
-      const fangornConfig: AppConfig = {litActionCid, circuitJsonCid, zkGateContractAddress, chain: baseSepolia, chainName: "baseSepolia", rpcUrl: "https://sepolia.base.org"}
-      const fangornClient = await Fangorn.init(userAccount, jwt, gateway, fangornConfig);
-
-      console.log('Setting Client!');
-
-      setClient(fangornClient);
-      setAccount(userAccount);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-      console.error('Fangorn connection error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Auto-connect on mount
-  useEffect(() => {
-    connect();
-  }, [connect]);
-
-  const disconnect = useCallback(() => {
-    setClient(null);
-    setAccount(null);
-    setError(null);
-  }, []);
+    initializeFangorn();
+  }, [account]);
 
   return (
-    <FangornContext.Provider
-      value={{ client, account, loading, error, connect, disconnect }}
-    >
+    <FangornContext.Provider value={{ client, loading, error }}>
       {children}
     </FangornContext.Provider>
   );
+}
+
+export function useFangorn() {
+  return useContext(FangornContext);
 }
