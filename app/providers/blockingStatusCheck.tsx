@@ -4,7 +4,7 @@ import { useFangorn } from "./fangornProvider";
 
 export function BlockingStatusCheck({ children }: { children: ReactNode }) {
   const { account, loading: walletLoading, error: walletError, connect } = useWallet();
-  const { client, loading: fangornLoading, error: fangornError, retry } = useFangorn();
+  const { loading: fangornLoading, error: fangornError, retry } = useFangorn();
 
   // Wallet is loading
   if (walletLoading) {
