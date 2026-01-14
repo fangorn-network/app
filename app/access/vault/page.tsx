@@ -25,7 +25,7 @@ export default function Page() {
 
   const handleCloseVault = async () => {
     cleanupVaultContext();
-    router.push('/');
+    router.push('/access');
   };
 
   const handleEntryClick = (entry: VaultEntry) => {
