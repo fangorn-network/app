@@ -4,11 +4,13 @@ import { useFangorn } from '@/app/providers/fangornProvider';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import { EntryContext } from '../entryContext';
+import { useError } from '@/app/providers/errorContextProvider';
 
 export default function Page() {
   const { currentVaultId, currentVaultName } = useContext(AppContext);
   const { selectedEntry } = useContext(EntryContext);
   const { client } = useFangorn();
+  const {showError} = useError();
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
@@ -17,8 +19,6 @@ export default function Page() {
 
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
-
-
 
     try {
       console.log(
@@ -64,6 +64,7 @@ export default function Page() {
       }
     } catch (error) {
       console.error('Decryption failed:', error);
+      showError(error as Error);
     } finally {
       setIsDecrypting(false);
       setPassword('');

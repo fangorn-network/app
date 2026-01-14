@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation';
 import { AppContext, VaultMetadata } from '../providers/vaultContextProvider';
 import { useFangorn } from '../providers/fangornProvider';
 import { Hex } from 'viem';
+import { useError } from '../providers/errorContextProvider';
 
 export default function Page() {
   const { setVaultId, allVaults, setVaults } = useContext(AppContext);
+  const {showError} = useError();
   const { client } = useFangorn();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function Page() {
         // loads vaultIds that we own
         const vaults: VaultMetadata[] = [];
         const vaultIds = await client?.getUserVaults();
+        console.log("Loading vaults");
         // load vault metadata (TODO - Q: is it better to query this per-vault, or to duplicate the vault name in storage?)
         for (const vaultId of vaultIds!) {
           const vaultIdHex = vaultId as Hex;
@@ -26,10 +29,11 @@ export default function Page() {
           vaults.push({ id: vaultIdHex, name: vaultData!.name })
         }
         setVaults(vaults);
+        setIsLoading(false);
       } catch (err) {
         console.error('Failed to load vaults:', err);
-      } finally {
         setIsLoading(false);
+        showError(err as Error);
       }
     };
 
@@ -38,7 +42,7 @@ export default function Page() {
     } else {
       setIsLoading(false);
     }
-  }, [client, setVaults]);
+  }, [client, setVaults, showError]);
 
   return (
     <div>

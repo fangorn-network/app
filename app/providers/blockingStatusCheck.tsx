@@ -3,7 +3,7 @@ import { useWallet } from "./walletProvider";
 import { useFangorn } from "./fangornProvider";
 
 export function BlockingStatusCheck({ children }: { children: ReactNode }) {
-  const { account, loading: walletLoading, error: walletError, connect } = useWallet();
+  const { loading: walletLoading, error: walletError, connect, walletClient } = useWallet();
   const { loading: fangornLoading, error: fangornError, retry } = useFangorn();
 
   // Wallet is loading
@@ -17,7 +17,7 @@ export function BlockingStatusCheck({ children }: { children: ReactNode }) {
   }
 
   // No wallet connected (includes rejection case)
-  if (!account) {
+  if (!walletClient) {
     return (
       <div className="screen-container">
         <div className="content-wrapper">

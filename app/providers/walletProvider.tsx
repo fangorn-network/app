@@ -7,7 +7,6 @@ import { baseSepolia } from 'viem/chains';
 // ========== Wallet Provider ==========
 
 interface WalletContextType {
-  account: string | null;
   walletClient: WalletClient | null;
   chain: Chain | null;
   loading: boolean;
@@ -17,7 +16,6 @@ interface WalletContextType {
 }
 
 const WalletContext = createContext<WalletContextType>({
-  account: null,
   walletClient: null,
   chain: null,
   loading: true,
@@ -27,7 +25,6 @@ const WalletContext = createContext<WalletContextType>({
 });
 
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const [account, setAccount] = useState<string | null>(null);
   const [walletClient, setWalletClient] = useState<WalletClient | null> (null);
   const [chain, setChain] = useState<Chain | null> (null);
   const [loading, setLoading] = useState(true);
@@ -100,10 +97,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       setWalletClient(walletClient);
       setChain(baseSepolia);
-      setAccount(userAccount);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
-      setAccount(null);
       setWalletClient(null);
       console.error('Wallet connection error:', err);
     } finally {
@@ -112,7 +107,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const disconnect = useCallback(() => {
-    setAccount(null);
+    console.log("disconnect called")
+    setWalletClient(null);
     setError(null);
   }, []);
 
@@ -130,7 +126,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (accounts.length === 0) {
         disconnect();
       } else {
-        setAccount(accounts[0]);
+        console.log("New user account: ", accounts[0]);
+        const changedAccount = accounts[0];
+        const walletClient: WalletClient = createWalletClient({
+				  account: getAddress(changedAccount as Address),
+				  transport: custom(window.ethereum),
+				  chain: baseSepolia,
+			  });
+        setWalletClient(walletClient);
       }
     };
 
@@ -148,7 +151,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [disconnect]);
 
   return (
-    <WalletContext.Provider value={{ account, loading, error, walletClient, chain, connect, disconnect }}>
+    <WalletContext.Provider value={{ loading, error, walletClient, chain, connect, disconnect }}>
       {children}
     </WalletContext.Provider>
   );

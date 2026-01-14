@@ -4,11 +4,13 @@ import { useRouter } from 'next/navigation';
 import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useFangorn } from '@/app/providers/fangornProvider';
 import { Filedata } from 'fangorn-sdk/lib/types/types';
+import { useError } from '@/app/providers/errorContextProvider';
 
 export default function Page() {
   const { currentVaultId, setEntries, setVaultManifest } =
     useContext(AppContext);
   const { client } = useFangorn();
+  const {showError} = useError();
   const [secretLabel, setSecretLabel] = useState('');
   const [secretInfo, setSecretInfo] = useState('');
   const [uploadMode, setUploadMode] = useState('text'); // 'text' or 'file'
@@ -53,16 +55,16 @@ export default function Page() {
     const vaultHex = currentVaultId as `0x${string}`;
     const manifestInfo = await client?.upload(vaultHex, [fileData], false);
     if (!manifestInfo) {
-      router.push('/access/vault')
+      showError("An error occurred when retrieving the manifest information");
     } else {
       setLoadingText('Retreiving new manifest...');
       if (!client) {
-        router.push('/')
+        showError("The fangorn client never loaded");
       } else {
         const manifest = await client.fetchManifest(manifestInfo.manifestCid!);
         if (!manifest) {
           // TODO: Display error saying something went wrong with manifest retrieval
-          router.push('/access/vault')
+          showError("An error occurred when retrieving the manifest");
         } else {
           setVaultManifest(manifest);
           setEntries(manifest.entries);

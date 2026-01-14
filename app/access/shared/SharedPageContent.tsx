@@ -4,6 +4,7 @@ import { useFangorn } from '@/app/providers/fangornProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { VaultEntry } from 'fangorn-sdk/lib/types/types';
+import { useError } from '@/app/providers/errorContextProvider';
 
 export default function SharedPageContent() {
   // Route -> /access/shared/[vaultId]/[entryCid]
@@ -12,11 +13,11 @@ export default function SharedPageContent() {
   const entryCid = params.get('entryId');
   const { setVault, setVaultManifest, setVaultName, setVaultId, currentVaultId, currentVaultName, cleanupVaultContext } = useContext(AppContext);
   const { client, loading } = useFangorn();
+  const {showError} = useError();
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [sharedEntry, setSharedEntry] = useState<VaultEntry | null>(null);
 
   useEffect( () => {
@@ -32,26 +33,21 @@ export default function SharedPageContent() {
             console.log("retreiving vault")
             const vault = await client.getVault(vaultId! as `0x${string}`);
             if(!vault) {
-              setIsError(true)
+              showError("The vault associated with the shared file was not found");
             } else {
               setVaultName(vault.name);
-               console.log("vault: ", vault);
               setVault(vault);
-              console.log("retreiving manifest")
               const manifest = await client.fetchManifest(vault.manifestCid!);
               if(!manifest) {
-                setIsError(true)
+                showError("The manifest associated with the shared file was not found");
               } else {
-                setVaultManifest(manifest!);
-                console.log("searching manifest for entry info")
+                setVaultManifest(manifest);
                 const matchedEntry = manifest?.entries.filter(e => e.cid === entryCid);
                 if (matchedEntry) {
-                  console.log("found entry")
                   setSharedEntry(matchedEntry[0]);
                   setIsLoading(false);
                 } else {
-                  console.log("something went wrong")
-                  setIsError(true);
+                  showError("The shared file was not found");
                   setIsLoading(false);
                 }
               }
@@ -61,10 +57,10 @@ export default function SharedPageContent() {
           }
         }
     }
-    if (!sharedEntry && !isError && !loading) {
+    if (!sharedEntry && !loading) {
         loadVault();
     } 
-  }, [loading, client, entryCid, isError, setVault, setVaultId, setVaultManifest, setVaultName, sharedEntry, vaultId, router])
+  }, [loading, client, entryCid, setVault, setVaultId, setVaultManifest, setVaultName, sharedEntry, vaultId, router, showError])
 
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
@@ -120,15 +116,6 @@ export default function SharedPageContent() {
     }
   };
 
-    useEffect(() => {
-    if (isError) {
-      const timer = setTimeout(() => {
-        router.push('/');
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentVaultId, router, isError]);
-
   const handleBack = () => {
     cleanupVaultContext();
     router.push('/');
@@ -142,19 +129,6 @@ export default function SharedPageContent() {
         </div>
       </div>
     );
-  } else if (isError) {
-
-    return (
-      <div className="screen-container">
-        <div className="content-wrapper space-y-6">
-          <div className="spinner"></div>
-          <h2 className="section-title">
-            Entry not found. Redirecting home.
-          </h2>
-        </div>
-      </div>
-    );
-
   } else {
 
     return (

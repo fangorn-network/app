@@ -19,13 +19,13 @@ const FangornContext = createContext<FangornContextType>({
 });
 
 export function FangornProvider({ children }: { children: ReactNode }) {
-  const { account, error: WalletError, chain, walletClient } = useWallet();
+  const { error: WalletError, chain, walletClient } = useWallet();
   const [client, setClient] = useState<Fangorn | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const initializeFangorn = useCallback(async () => {
-    if (!account || WalletError || !chain || !walletClient) {
+    if (WalletError || !chain || !walletClient) {
       setClient(null);
       setLoading(false);
       setError(null);
@@ -71,13 +71,13 @@ export function FangornProvider({ children }: { children: ReactNode }) {
 
       console.log('Fangorn client initialized');
       setClient(fangornClient);
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
       setError(err instanceof Error ? err : new Error('Unknown error'));
       console.error('Fangorn initialization error:', err);
-    } finally {
-      setLoading(false);
     }
-  }, [account, WalletError, chain, walletClient]);
+  }, [WalletError, chain, walletClient]);
 
   // Initialize Fangorn client when account is available
   useEffect(() => {

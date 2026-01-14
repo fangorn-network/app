@@ -4,10 +4,12 @@ import {
   createContext,
   useState,
   ReactNode,
+  useEffect,
 } from 'react';
 import { Vault } from 'fangorn-sdk/lib/interface/zkGate';
 import { VaultEntry, VaultManifest } from 'fangorn-sdk/lib/types/types.js';
 import { Hex } from 'viem';
+import { useWallet } from './walletProvider';
 
 type VaultContextType = {
   currentVaultId?: string;
@@ -47,6 +49,7 @@ export interface VaultMetadata {
 }
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
+  const {walletClient} = useWallet();
   const [currentVaultId, setVaultId] = useState('');
   const [currentVaultName, setVaultName] = useState('');
   const [entries, setEntries] = useState<VaultEntry[]>([]);
@@ -61,6 +64,10 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setVault(null);
     setVaultManifest(null);
   };
+
+  useEffect(() => {
+    cleanupVaultContext();
+  },[walletClient])
 
   return (
     <AppContext.Provider

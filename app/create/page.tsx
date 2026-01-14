@@ -3,8 +3,10 @@ import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '../providers/vaultContextProvider';
 import { useFangorn } from '../providers/fangornProvider';
+import { useError } from '../providers/errorContextProvider';
 export default function Page() {
   const { setVaultId } = useContext(AppContext);
+  const {showError} = useError();
   const { client } = useFangorn();
   const [password, setPassword] = useState('');
   const [vaultName, setVaultName] = useState('');
@@ -27,7 +29,7 @@ export default function Page() {
       setVaultId(vaultId);
       router.push('/create/success');
     } else {
-      throw new Error('Vault Creation Failed');
+      showError('Vault Creation Failed')
     }
   };
   return (

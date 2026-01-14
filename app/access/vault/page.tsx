@@ -46,7 +46,7 @@ useEffect(() => {
     const vault = await client.getVault(vaultHex);
     setVaultName(vault.name);
     setVault(vault);
-    if (vault?.manifestCid) {
+    if (vault.manifestCid) {
       setLoadingText('Loading manifest...');
       const manifest = await client.fetchManifest(vault.manifestCid);
       setVaultManifest(manifest);
@@ -98,12 +98,6 @@ return (
                 >
                   Add
                 </button>
-                {/* <button
-                  onClick={() => alert('Export functionality coming soon')}
-                  className="btn-secondary"
-                >
-                  Export
-                </button> */}
                 <button onClick={handleCloseVault} className="btn-neutral">
                   Close
                 </button>
