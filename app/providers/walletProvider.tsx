@@ -60,6 +60,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           });
         } catch (addError) {
           console.log('Error: ', addError);
+          setError(addError as Error);
           throw new Error('Failed to add Base Sepolia network to MetaMask');
         }
       } else {
@@ -144,11 +145,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setChain(baseSepolia);
         }
       } catch (err) {
-        if (mounted) {
           setError(err instanceof Error ? err : new Error('Unknown error'));
           setWalletClient(null);
+          setLoading(false);
           console.error('Wallet auto-connect error:', err);
-        }
       } finally {
         if (mounted) {
           setLoading(false);
