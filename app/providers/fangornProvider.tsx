@@ -124,14 +124,12 @@ export function FangornProvider({ children }: { children: ReactNode }) {
 
   // Reset initialization status when wallet changes
   useEffect(() => {
-    if (!walletClient) {
-      console.log('Wallet disconnected, resetting Fangorn state...');
-      hasInitializedRef.current = false;
-      isInitializingRef.current = false;
-      setClient(null);
-      setError(null);
-      setLoading(true);
-    }
+    console.log('Wallet client changed resetting Fangorn state...');
+    hasInitializedRef.current = false;
+    isInitializingRef.current = false;
+    setClient(null);
+    setError(null);
+    setLoading(true);
   }, [walletClient]);
 
   return (
