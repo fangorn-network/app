@@ -4,8 +4,6 @@ import { createContext, useState, useCallback, ReactNode, useEffect, useContext 
 import { Address, Chain, createWalletClient, custom, getAddress, ProviderRpcErrorCode, WalletClient } from 'viem';
 import { baseSepolia } from 'viem/chains';
 
-// ========== Wallet Provider ==========
-
 interface WalletContextType {
   walletClient: WalletClient | null;
   chain: Chain | null;
@@ -25,8 +23,8 @@ const WalletContext = createContext<WalletContextType>({
 });
 
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const [walletClient, setWalletClient] = useState<WalletClient | null> (null);
-  const [chain, setChain] = useState<Chain | null> (null);
+  const [walletClient, setWalletClient] = useState<WalletClient | null>(null);
+  const [chain, setChain] = useState<Chain | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -90,10 +88,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       await switchToBaseSepolia();
 
       const walletClient: WalletClient = createWalletClient({
-				account: getAddress(userAccount as Address),
-				transport: custom(window.ethereum),
-				chain: baseSepolia,
-			});
+        account: getAddress(userAccount as Address),
+        transport: custom(window.ethereum),
+        chain: baseSepolia,
+      });
 
       setWalletClient(walletClient);
       setChain(baseSepolia);
@@ -107,17 +105,64 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const disconnect = useCallback(() => {
-    console.log("disconnect called")
+    console.log("disconnect called");
     setWalletClient(null);
     setError(null);
   }, []);
 
-  // Auto-connect on mount
   useEffect(() => {
-    connect();
-  }, [connect]);
+    let mounted = true;
 
-  // Listen for account changes
+    const autoConnect = async () => {
+      if (!mounted) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        console.log('Auto-connecting to wallet');
+        if (!window.ethereum) {
+          throw new Error('MetaMask is not installed');
+        }
+
+        const [userAccount] = await window.ethereum.request({
+          method: 'eth_requestAccounts',
+        });
+
+        if (!mounted) return;
+
+        await switchToBaseSepolia();
+
+        const walletClient: WalletClient = createWalletClient({
+          account: getAddress(userAccount as Address),
+          transport: custom(window.ethereum),
+          chain: baseSepolia,
+        });
+
+        if (mounted) {
+          setWalletClient(walletClient);
+          setChain(baseSepolia);
+        }
+      } catch (err) {
+        if (mounted) {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+          setWalletClient(null);
+          console.error('Wallet auto-connect error:', err);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    autoConnect();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (!window.ethereum) return;
 
@@ -129,10 +174,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         console.log("New user account: ", accounts[0]);
         const changedAccount = accounts[0];
         const walletClient: WalletClient = createWalletClient({
-				  account: getAddress(changedAccount as Address),
-				  transport: custom(window.ethereum),
-				  chain: baseSepolia,
-			  });
+          account: getAddress(changedAccount as Address),
+          transport: custom(window.ethereum),
+          chain: baseSepolia,
+        });
         setWalletClient(walletClient);
       }
     };
