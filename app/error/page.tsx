@@ -1,6 +1,6 @@
 'use client'
 import { useError } from '../providers/errorContextProvider';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function ErrorPage() {
   const router = useRouter();
