@@ -91,17 +91,13 @@ export default function Page() {
     router.push('/access/vault');
   };
 
-  if (!selectedEntry) {
-    return (
-      <div className="screen-container">
-        <div className="content-wrapper">
-          <div className="spinner"></div>
-        </div>
-      </div>
-    );
-  }
+  console.log("selected entry: ", selectedEntry);
 
-  return (
+  if (!selectedEntry) {
+    router.push("/access/vault");
+  } else {
+
+    return (
     <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
         <h2 className="section-title">{currentVaultName}</h2>
@@ -190,4 +186,5 @@ export default function Page() {
       </div>
     </div>
   );
+  }
 }

@@ -1,17 +1,13 @@
 'use client'
 import { useError } from '../providers/errorContextProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function ErrorPage() {
   const router = useRouter();
-  const { clearError } = useError();
-  
-  // Get error message from URL params
-  const searchParams = typeof window !== 'undefined' 
-    ? new URLSearchParams(window.location.search)
-    : new URLSearchParams();
-  
-  const errorMessage = searchParams.get('message') || 'An unexpected error occurred';
+
+  const {error, clearError} = useError();
+
+  const errorMessage = error?.message || 'An unexpected error occurred';
 
   const handleGoBack = () => {
     clearError();

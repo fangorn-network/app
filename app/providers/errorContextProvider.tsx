@@ -22,11 +22,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
   const showError = useCallback((error: Error | string) => {
     const errorObj = typeof error === 'string' ? new Error(error) : error;
     setError(errorObj);
-    
-    console.error('Application error:', errorObj);
-    // Encode error message for URL
-    const encodedMessage = encodeURIComponent(errorObj.message);
-    router.push(`/error?message=${encodedMessage}`);
+    router.push('/error');
   }, [router]);
 
   const clearError = useCallback(() => {

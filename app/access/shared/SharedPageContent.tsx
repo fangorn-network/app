@@ -1,8 +1,7 @@
 'use client';
-import { AppContext } from '@/app/providers/vaultContextProvider';
 import { useFangorn } from '@/app/providers/fangornProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { VaultEntry } from 'fangorn-sdk/lib/types/types';
 import { useError } from '@/app/providers/errorContextProvider';
 
@@ -11,7 +10,8 @@ export default function SharedPageContent() {
   const params = useSearchParams();
   const vaultId = params.get('vaultId');
   const entryCid = params.get('entryId');
-  const { setVault, setVaultManifest, setVaultName, setVaultId, currentVaultId, currentVaultName, cleanupVaultContext } = useContext(AppContext);
+  const [sharedVaultId, setVaultId] = useState('');
+  const [sharedVaultName, setVaultName] = useState('');
   const { client, loading } = useFangorn();
   const {showError} = useError();
   const router = useRouter();
@@ -23,6 +23,7 @@ export default function SharedPageContent() {
   useEffect( () => {
 
     const loadVault = async() => {
+
         if (!vaultId || !entryCid) {
           router.push('/');
         } else {
@@ -36,12 +37,10 @@ export default function SharedPageContent() {
               showError("The vault associated with the shared file was not found");
             } else {
               setVaultName(vault.name);
-              setVault(vault);
               const manifest = await client.fetchManifest(vault.manifestCid!);
               if(!manifest) {
                 showError("The manifest associated with the shared file was not found");
               } else {
-                setVaultManifest(manifest);
                 const matchedEntry = manifest?.entries.filter(e => e.cid === entryCid);
                 if (matchedEntry) {
                   setSharedEntry(matchedEntry[0]);
@@ -59,8 +58,8 @@ export default function SharedPageContent() {
     }
     if (!sharedEntry && !loading) {
         loadVault();
-    } 
-  }, [loading, client, entryCid, setVault, setVaultId, setVaultManifest, setVaultName, sharedEntry, vaultId, router, showError])
+    }
+  }, [loading, client, entryCid, setVaultId, setVaultName, sharedEntry, vaultId, router, showError])
 
   const handleDecryptAndDownload = async () => {
     setIsDecrypting(true);
@@ -80,9 +79,8 @@ export default function SharedPageContent() {
       if(!client || !sharedEntry) {
         router.push('/')
       } else {
-
       const decryptedContent = await client.decryptFile(
-        currentVaultId as `0x${string}`,
+        sharedVaultId as `0x${string}`,
         sharedEntry.tag,
         password,
       );
@@ -110,14 +108,13 @@ export default function SharedPageContent() {
       }
     } catch (error) {
       console.error('Decryption failed:', error);
+      showError(error as Error);
     } finally {
       setIsDecrypting(false);
       setPassword('');
     }
   };
-
   const handleBack = () => {
-    cleanupVaultContext();
     router.push('/');
   };
 
@@ -134,7 +131,7 @@ export default function SharedPageContent() {
     return (
     <div className="screen-container-top">
       <div className="content-wrapper space-y-6">
-        <h2 className="section-title">{currentVaultName}</h2>
+        <h2 className="section-title">{sharedVaultName}</h2>
 
         <div className="card-lg space-y-4">
           <div>
