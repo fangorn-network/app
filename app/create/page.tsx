@@ -6,7 +6,7 @@ import { useFangorn } from '../providers/fangornProvider';
 import { useError } from '../providers/errorContextProvider';
 export default function Page() {
   const { setVaultId } = useContext(AppContext);
-  const {showError} = useError();
+  const { showError } = useError();
   const { client } = useFangorn();
   const [password, setPassword] = useState('');
   const [vaultName, setVaultName] = useState('');
@@ -29,7 +29,7 @@ export default function Page() {
       setVaultId(vaultId);
       router.push('/create/success');
     } else {
-      showError('Vault Creation Failed')
+      showError('Vault Creation Failed');
     }
   };
   return (

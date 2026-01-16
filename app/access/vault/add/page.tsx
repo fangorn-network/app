@@ -10,7 +10,7 @@ export default function Page() {
   const { currentVaultId, setEntries, setVaultManifest } =
     useContext(AppContext);
   const { client } = useFangorn();
-  const {showError} = useError();
+  const { showError } = useError();
   const [secretLabel, setSecretLabel] = useState('');
   const [secretInfo, setSecretInfo] = useState('');
   const [uploadMode, setUploadMode] = useState('text'); // 'text' or 'file'
@@ -55,25 +55,23 @@ export default function Page() {
     const vaultHex = currentVaultId as `0x${string}`;
     const manifestInfo = await client?.upload(vaultHex, [fileData], false);
     if (!manifestInfo) {
-      showError("An error occurred when retrieving the manifest information");
+      showError('An error occurred when retrieving the manifest information');
     } else {
       setLoadingText('Retreiving new manifest...');
       if (!client) {
-        showError("The fangorn client never loaded");
+        showError('The fangorn client never loaded');
       } else {
         const manifest = await client.fetchManifest(manifestInfo.manifestCid!);
         if (!manifest) {
           // TODO: Display error saying something went wrong with manifest retrieval
-          showError("An error occurred when retrieving the manifest");
+          showError('An error occurred when retrieving the manifest');
         } else {
           setVaultManifest(manifest);
           setEntries(manifest.entries);
           setLoadingText('Complete!');
           router.push('/access/vault/add/success');
         }
-
       }
-
     }
   };
 

@@ -8,7 +8,7 @@ import { useError } from '../providers/errorContextProvider';
 
 export default function Page() {
   const { setVaultId, allVaults, setVaults } = useContext(AppContext);
-  const {showError} = useError();
+  const { showError } = useError();
   const { client } = useFangorn();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -20,12 +20,12 @@ export default function Page() {
         // loads vaultIds that we own
         const vaults: VaultMetadata[] = [];
         const vaultIds = await client?.getUserVaults();
-        console.log("Loading vaults");
+        console.log('Loading vaults');
         // load vault metadata (TODO - Q: is it better to query this per-vault, or to duplicate the vault name in storage?)
         for (const vaultId of vaultIds!) {
           const vaultIdHex = vaultId as Hex;
           const vaultData = await client?.getVault(vaultIdHex);
-          vaults.push({ id: vaultIdHex, name: vaultData!.name })
+          vaults.push({ id: vaultIdHex, name: vaultData!.name });
         }
         setVaults(vaults);
         setIsLoading(false);

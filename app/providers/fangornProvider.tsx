@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, useState, ReactNode, useEffect, useContext, useCallback } from 'react';
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import { AppConfig, Fangorn } from 'fangorn-sdk';
 import { useConnection, useWalletClient } from 'wagmi';
 
@@ -24,7 +31,6 @@ export function FangornProvider({ children }: { children: ReactNode }) {
   const [client, setClient] = useState<Fangorn | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
 
   const initializeFangorn = useCallback(async () => {
     if (!address || !isConnected || !walletClient) {
@@ -50,10 +56,13 @@ export function FangornProvider({ children }: { children: ReactNode }) {
       if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID required');
 
       const circuitJsonCid = process.env.NEXT_PUBLIC_CIRCUIT_JSON_CID;
-      if (!circuitJsonCid) throw new Error('NEXT_PUBLIC_CIRCUIT_JSON_CID required');
+      if (!circuitJsonCid)
+        throw new Error('NEXT_PUBLIC_CIRCUIT_JSON_CID required');
 
-      const zkGateContractAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as `0x${string}`;
-      if (!zkGateContractAddress) throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
+      const zkGateContractAddress = process.env
+        .NEXT_PUBLIC_ZK_GATE_ADDR as `0x${string}`;
+      if (!zkGateContractAddress)
+        throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
 
       const fangornConfig: AppConfig = {
         litActionCid,
@@ -64,7 +73,12 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         rpcUrl: 'https://sepolia.base.org',
       };
 
-      const fangornClient = await Fangorn.init(jwt, gateway, walletClient, fangornConfig);
+      const fangornClient = await Fangorn.init(
+        jwt,
+        gateway,
+        walletClient,
+        fangornConfig
+      );
 
       console.log('Fangorn client initialized successfully');
       setClient(fangornClient);
@@ -76,26 +90,30 @@ export function FangornProvider({ children }: { children: ReactNode }) {
     }
   }, [isConnected, walletClient, address]);
 
-useEffect(() => {
-  // Don't initialize until walletClient matches the current address
-  if (!address || !isConnected || !walletClient) {
-    setClient(null);
-    setLoading(false);
-    return;
-  }
+  useEffect(() => {
+    // Don't initialize until walletClient matches the current address
+    if (!address || !isConnected || !walletClient) {
+      setClient(null);
+      setLoading(false);
+      return;
+    }
 
-  // Wait for walletClient to sync with current address
-  if (walletClient.account?.address?.toLowerCase() !== address.toLowerCase()) {
-    setClient(null);
-    setLoading(true);
-    return;
-  }
+    // Wait for walletClient to sync with current address
+    if (
+      walletClient.account?.address?.toLowerCase() !== address.toLowerCase()
+    ) {
+      setClient(null);
+      setLoading(true);
+      return;
+    }
 
-  initializeFangorn();
-}, [address, isConnected, walletClient, initializeFangorn]);
+    initializeFangorn();
+  }, [address, isConnected, walletClient, initializeFangorn]);
 
   return (
-    <FangornContext.Provider value={{ client, loading, error, retry: initializeFangorn }}>
+    <FangornContext.Provider
+      value={{ client, loading, error, retry: initializeFangorn }}
+    >
       {children}
     </FangornContext.Provider>
   );

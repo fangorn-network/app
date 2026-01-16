@@ -1,6 +1,6 @@
-import { cookieStorage, createConfig, createStorage, http } from 'wagmi'
-import { baseSepolia } from 'wagmi/chains'
-import { injected } from 'wagmi/connectors'
+import { cookieStorage, createConfig, createStorage, http } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
 
 export function getConfig() {
   return createConfig({
@@ -8,10 +8,10 @@ export function getConfig() {
     connectors: [injected()],
     ssr: true,
     storage: createStorage({
-      storage: cookieStorage
+      storage: cookieStorage,
     }),
     transports: {
       [baseSepolia.id]: http(),
     },
-  })
+  });
 }

@@ -10,22 +10,24 @@ import { ErrorProvider } from './errorContextProvider';
 import { BlockingStatusCheck } from './blockingStatusCheck';
 
 type Props = {
-    children: ReactNode,
-    initialState: State | undefined
-}
+  children: ReactNode;
+  initialState: State | undefined;
+};
 
 export function Providers({ children, initialState }: Props) {
-  const [config] = useState(() => getConfig())
-  const [queryClient] = useState(() => new QueryClient())
+  const [config] = useState(() => getConfig());
+  const [queryClient] = useState(() => new QueryClient());
   return (
     <ErrorProvider>
-      <WagmiProvider config={config} initialState={initialState} reconnectOnMount = {true}>
+      <WagmiProvider
+        config={config}
+        initialState={initialState}
+        reconnectOnMount={true}
+      >
         <QueryClientProvider client={queryClient}>
           <FangornProvider>
             <AppContextProvider>
-                <BlockingStatusCheck>
-                    {children}
-                </BlockingStatusCheck>
+              <BlockingStatusCheck>{children}</BlockingStatusCheck>
             </AppContextProvider>
           </FangornProvider>
         </QueryClientProvider>

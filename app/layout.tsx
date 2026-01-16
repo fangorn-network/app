@@ -12,16 +12,14 @@ export default async function RootLayout({
   const initialState = cookieToInitialState(
     getConfig(),
     (await headers()).get('cookie')
-  )
+  );
 
   console.log('initial state', initialState);
 
   return (
     <html lang="en">
       <body>
-        <Providers initialState={initialState}>
-            {children}
-        </Providers>
+        <Providers initialState={initialState}>{children}</Providers>
       </body>
     </html>
   );

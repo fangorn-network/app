@@ -1,7 +1,12 @@
-
 'use client';
 
-import { createContext, useState, useCallback, ReactNode, useContext } from 'react';
+import {
+  createContext,
+  useState,
+  useCallback,
+  ReactNode,
+  useContext,
+} from 'react';
 import { useRouter } from 'next/navigation';
 interface ErrorContextType {
   showError: (error: Error | string) => void;
@@ -19,11 +24,14 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
   const router = useRouter();
 
-  const showError = useCallback((error: Error | string) => {
-    const errorObj = typeof error === 'string' ? new Error(error) : error;
-    setError(errorObj);
-    router.push('/error');
-  }, [router]);
+  const showError = useCallback(
+    (error: Error | string) => {
+      const errorObj = typeof error === 'string' ? new Error(error) : error;
+      setError(errorObj);
+      router.push('/error');
+    },
+    [router]
+  );
 
   const clearError = useCallback(() => {
     setError(null);

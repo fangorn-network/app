@@ -1,11 +1,11 @@
-'use client'
+'use client';
 import { useError } from '../providers/errorContextProvider';
 import { useRouter } from 'next/navigation';
 
 export default function ErrorPage() {
   const router = useRouter();
 
-  const {error, clearError} = useError();
+  const { error, clearError } = useError();
 
   const errorMessage = error?.message || 'An unexpected error occurred';
 
@@ -33,13 +33,13 @@ export default function ErrorPage() {
           <div className="card-lg space-y-4">
             <div>
               <label className="form-label">Error Details</label>
-              <div className="display-field-mono">
-                {errorMessage}
-              </div>
+              <div className="display-field-mono">{errorMessage}</div>
             </div>
 
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Something went wrong while processing your request. You can try going back and attempting the action again, or return to the home page.
+              Something went wrong while processing your request. You can try
+              going back and attempting the action again, or return to the home
+              page.
             </p>
           </div>
 

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useState,
-  ReactNode,
-  useEffect,
-  useRef,
-} from 'react';
+import { createContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { Vault } from 'fangorn-sdk/lib/interface/zkGate';
 import { VaultEntry, VaultManifest } from 'fangorn-sdk/lib/types/types.js';
 import { Hex } from 'viem';
@@ -56,7 +50,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
   const [allVaults, setVaults] = useState<VaultMetadata[]>([]);
   const [vault, setVault] = useState<Vault | null>();
   const [manifest, setVaultManifest] = useState<VaultManifest | null>();
-  const {address} = useConnection();
+  const { address } = useConnection();
   const previousAddress = useRef<string | undefined>(address);
 
   const cleanupVaultContext = () => {
@@ -67,7 +61,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setVaultManifest(null);
   };
 
- useEffect(() => {
+  useEffect(() => {
     if (previousAddress.current && address !== previousAddress.current) {
       cleanupVaultContext();
     }

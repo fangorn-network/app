@@ -33,32 +33,41 @@ export default function Page() {
     router.push('/access/vault/entry');
   };
 
-const hasLoadedRef = useRef(false);
+  const hasLoadedRef = useRef(false);
 
-useEffect(() => {
-  if (hasLoadedRef.current || !client || !currentVaultId || !isLoading) return;
-  
-  hasLoadedRef.current = true;
-  
-  const loadVault = async () => {
-    setLoadingText('Loading vault...');
-    const vaultHex = currentVaultId as `0x${string}`;
-    const vault = await client.getVault(vaultHex);
-    setVaultName(vault.name);
-    setVault(vault);
-    if (vault.manifestCid) {
-      setLoadingText('Loading manifest...');
-      const manifest = await client.fetchManifest(vault.manifestCid);
-      setVaultManifest(manifest);
-      setEntries(manifest.entries);
-    }
-    setIsLoading(false);
-  };
-  
-  loadVault();
-}, [client, currentVaultId, isLoading, setVaultName, setVault, setVaultManifest, setEntries]);
+  useEffect(() => {
+    if (hasLoadedRef.current || !client || !currentVaultId || !isLoading)
+      return;
 
-return (
+    hasLoadedRef.current = true;
+
+    const loadVault = async () => {
+      setLoadingText('Loading vault...');
+      const vaultHex = currentVaultId as `0x${string}`;
+      const vault = await client.getVault(vaultHex);
+      setVaultName(vault.name);
+      setVault(vault);
+      if (vault.manifestCid) {
+        setLoadingText('Loading manifest...');
+        const manifest = await client.fetchManifest(vault.manifestCid);
+        setVaultManifest(manifest);
+        setEntries(manifest.entries);
+      }
+      setIsLoading(false);
+    };
+
+    loadVault();
+  }, [
+    client,
+    currentVaultId,
+    isLoading,
+    setVaultName,
+    setVault,
+    setVaultManifest,
+    setEntries,
+  ]);
+
+  return (
     <div>
       {isLoading ? (
         <div className="loading-container">
@@ -71,7 +80,9 @@ return (
             <div className="app-content" style={{ maxWidth: '400px' }}>
               <div className="vault-header">
                 <span className="vault-title">vault://{currentVaultName}</span>
-                <span className="vault-name">{entries?.length || 0} entries</span>
+                <span className="vault-name">
+                  {entries?.length || 0} entries
+                </span>
               </div>
 
               <div className="vault-entries">

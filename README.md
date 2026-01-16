@@ -11,7 +11,7 @@ This app demonstrates the capabilities provided by the Fangorn SDK.
 
 Copy .env.local and provide the pinata jwt fetched from https://app.pinata.cloud/developers/api-keys
 
-``` sh
+```sh
 NEXT_PUBLIC_CHAIN_RPC_URL=https://base-sepolia-public.nodies.app
 NEXT_PUBLIC_PINATA_GATEWAY=https://gateway.pinata.cloud
 PINATA_JWT=
@@ -19,9 +19,10 @@ PINATA_JWT=
 
 Install dependencies with NPM
 
-``` sh
+```sh
 npm i
 ```
 
 ## Running the app
+
 Run with `npm run dev`. This starts the the app on localhost:3000.
