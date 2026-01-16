@@ -5,11 +5,12 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useRef,
 } from 'react';
 import { Vault } from 'fangorn-sdk/lib/interface/zkGate';
 import { VaultEntry, VaultManifest } from 'fangorn-sdk/lib/types/types.js';
 import { Hex } from 'viem';
-import { useWallet } from './walletProvider';
+import { useConnection } from 'wagmi';
 
 type VaultContextType = {
   currentVaultId?: string;
@@ -49,13 +50,14 @@ export interface VaultMetadata {
 }
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
-  const {walletClient} = useWallet();
   const [currentVaultId, setVaultId] = useState('');
   const [currentVaultName, setVaultName] = useState('');
   const [entries, setEntries] = useState<VaultEntry[]>([]);
   const [allVaults, setVaults] = useState<VaultMetadata[]>([]);
   const [vault, setVault] = useState<Vault | null>();
   const [manifest, setVaultManifest] = useState<VaultManifest | null>();
+  const {address} = useConnection();
+  const previousAddress = useRef<string | undefined>(address);
 
   const cleanupVaultContext = () => {
     setVaultId('');
@@ -65,9 +67,12 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setVaultManifest(null);
   };
 
-  useEffect(() => {
-    cleanupVaultContext();
-  },[walletClient])
+ useEffect(() => {
+    if (previousAddress.current && address !== previousAddress.current) {
+      cleanupVaultContext();
+    }
+    previousAddress.current = address;
+  }, [address]);
 
   return (
     <AppContext.Provider

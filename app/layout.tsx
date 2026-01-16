@@ -1,61 +1,28 @@
-import type { Metadata } from 'next';
-import { Inter, Source_Code_Pro } from 'next/font/google';
-import { minikitConfig } from '../minikit.config';
+import { Providers } from './providers/providers';
 import './globals.css';
-import { AppContextProvider } from './providers/vaultContextProvider';
-import { FangornProvider } from './providers/fangornProvider';
-import { WalletProvider } from './providers/walletProvider';
-import { ErrorProvider } from './providers/errorContextProvider';
+import { cookieToInitialState } from 'wagmi';
+import { getConfig } from './wagmi-config';
+import { headers } from 'next/headers';
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: minikitConfig.miniapp.name,
-    description: minikitConfig.miniapp.description,
-    other: {
-      'fc:frame': JSON.stringify({
-        version: minikitConfig.miniapp.version,
-        imageUrl: minikitConfig.miniapp.heroImageUrl,
-        button: {
-          title: `Join the ${minikitConfig.miniapp.name} Waitlist`,
-          action: {
-            name: `Launch ${minikitConfig.miniapp.name}`,
-            type: 'launch_frame',
-          },
-        },
-      }),
-    },
-  };
-}
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-});
-
-const sourceCodePro = Source_Code_Pro({
-  variable: '--font-source-code-pro',
-  subsets: ['latin'],
-});
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const initialState = cookieToInitialState(
+    getConfig(),
+    (await headers()).get('cookie')
+  )
+
+  console.log('initial state', initialState);
+
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-        <ErrorProvider>
-          <WalletProvider>
-            <FangornProvider>
-              <AppContextProvider>
-                    {children}
-              </AppContextProvider>
-            </FangornProvider>
-          </WalletProvider>
-        </ErrorProvider>
+      <body>
+        <Providers initialState={initialState}>
+            {children}
+        </Providers>
       </body>
     </html>
-    
   );
 }

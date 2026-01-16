@@ -1,56 +1,8 @@
-// 'use client';
-
-// import { useMiniKit } from '@coinbase/onchainkit/minikit';
-// import { useRouter } from 'next/navigation';
-// import { useEffect } from 'react';
-
-// export default function BaseVaultApp() {
-//   // const { isMiniAppReady, setMiniAppReady } = useMiniKit();
-//   // Initialize the miniapp
-//   // useEffect(() => {
-//   //   if (!isMiniAppReady) {
-//   //     setMiniAppReady();
-//   //   }
-//   // }, [setMiniAppReady, isMiniAppReady]);
-//   const router = useRouter();
-//   return (
-//     <div className="screen-container">
-//       <div className="content-wrapper space-y-8">
-//         <div className="text-center">
-//           <h1 className="page-title">Fangorn Vault</h1>
-//           <p className="subtitle">Secure data storage on Base</p>
-//         </div>
-
-//         <div className="space-y-4">
-//           <button
-//             onClick={() => {
-//               router.push('/create');
-//             }}
-//             className="btn-primary-lg"
-//           >
-//             Create Vault
-//           </button>
-
-//           <button
-//             onClick={() => {
-//               router.push('/access');
-//             }}
-//             className="btn-secondary-lg"
-//           >
-//             Access Vault
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { BlockingStatusCheck } from './providers/blockingStatusCheck';
 
-// show waitlist if we are not running on testnet
 const WAITLIST_ENABLED = !process.env.NEXT_PUBLIC_CHAIN_RPC_URL!.includes("sepolia");
 
 export default function BaseVaultApp() {
@@ -83,13 +35,12 @@ export default function BaseVaultApp() {
 
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors', // required for Google Apps Script
+        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
       }).then(() => setSubmitted(true));
-      // With no-cors we can't read the response, but if it didn't throw, assume success
     } catch (err) {
       console.error('Waitlist signup error:', err);
       setError('Something went wrong. Please try again.');
@@ -100,7 +51,6 @@ export default function BaseVaultApp() {
 
   // Waitlist UI
 return (
-  <BlockingStatusCheck>
       <div className="app">
         <main className="app-main">
            {!WAITLIST_ENABLED && (
@@ -160,6 +110,5 @@ return (
           )}
         </main>
       </div>
-    </BlockingStatusCheck>
   );
 }

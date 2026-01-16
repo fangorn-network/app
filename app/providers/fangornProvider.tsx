@@ -1,8 +1,8 @@
 'use client';
 
-import { createContext, useState, useCallback, ReactNode, useEffect, useContext, useRef } from 'react';
+import { createContext, useState, ReactNode, useEffect, useContext, useCallback } from 'react';
 import { AppConfig, Fangorn } from 'fangorn-sdk';
-import { useWallet } from './walletProvider';
+import { useConnection, useWalletClient } from 'wagmi';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -19,53 +19,34 @@ const FangornContext = createContext<FangornContextType>({
 });
 
 export function FangornProvider({ children }: { children: ReactNode }) {
-  const { error: WalletError, chain, walletClient } = useWallet();
+  const { address, isConnected } = useConnection();
+  const { data: walletClient } = useWalletClient();
   const [client, setClient] = useState<Fangorn | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  
-  // Track if we're currently initializing to prevent concurrent calls
-  const isInitializingRef = useRef(false);
-  // Track if we've successfully initialized to prevent re-init
-  const hasInitializedRef = useRef(false);
+
 
   const initializeFangorn = useCallback(async () => {
-
-    if (WalletError || !chain || !walletClient) {
+    if (!address || !isConnected || !walletClient) {
       setClient(null);
       setLoading(false);
       setError(null);
       return;
     }
 
-
-    if (isInitializingRef.current) {
-      console.log('Already initializing, skipping...');
-      return;
-    }
-
-    // Guard: Don't re-initialize if already successful
-    if (hasInitializedRef.current && client) {
-      console.log('Already initialized, skipping...');
-      setLoading(false);
-      return;
-    }
-
-    isInitializingRef.current = true;
     setLoading(true);
     setError(null);
 
     try {
-      console.log('Initializing Fangorn client');
+      console.log('Initializing Fangorn client for address:', address);
+
+      console.log("walletClient: ", walletClient);
 
       const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
       if (!gateway) throw new Error('NEXT_PUBLIC_PINATA_GATEWAY required');
 
-      console.log('Requesting JWT');
-      const jwtResponse = await fetch('/api/jwt');
-      if (!jwtResponse.ok) throw new Error('Failed to fetch JWT');
-
-      const { jwt } = await jwtResponse.json();
+      const jwt = process.env.NEXT_PUBLIC_PINATA_JWT;
+      if (!jwt) throw new Error('NEXT_PUBLIC_PINATA_JWT required');
 
       const litActionCid = process.env.NEXT_PUBLIC_LIT_ACTION_CID;
       if (!litActionCid) throw new Error('NEXT_PUBLIC_LIT_ACTION_CID required');
@@ -75,8 +56,6 @@ export function FangornProvider({ children }: { children: ReactNode }) {
 
       const zkGateContractAddress = process.env.NEXT_PUBLIC_ZK_GATE_ADDR as `0x${string}`;
       if (!zkGateContractAddress) throw new Error('NEXT_PUBLIC_ZK_GATE_ADDR required');
-
-      console.log("Domain being used: ", window.location.host);
 
       const fangornConfig: AppConfig = {
         litActionCid,
@@ -89,51 +68,36 @@ export function FangornProvider({ children }: { children: ReactNode }) {
 
       const fangornClient = await Fangorn.init(jwt, gateway, walletClient, fangornConfig);
 
-      console.log('Fangorn client initialized');
+      console.log('Fangorn client initialized successfully');
       setClient(fangornClient);
-      hasInitializedRef.current = true;
-      setLoading(false);
     } catch (err) {
-      setLoading(false);
       setError(err instanceof Error ? err : new Error('Unknown error'));
       console.error('Fangorn initialization error:', err);
     } finally {
-      isInitializingRef.current = false;
+      setLoading(false);
     }
-  }, [WalletError, chain, walletClient, client]);
+  }, [isConnected, walletClient, address]);
 
-  const retry = useCallback(() => {
-    console.log('Retrying Fangorn initialization...');
-    hasInitializedRef.current = false;
+useEffect(() => {
+  // Don't initialize until walletClient matches the current address
+  if (!address || !isConnected || !walletClient) {
     setClient(null);
-    setError(null);
-    initializeFangorn();
-  }, [initializeFangorn]);
+    setLoading(false);
+    return;
+  }
 
-  // Initialize only when wallet becomes available and we haven't initialized yet
-  useEffect(() => {
-    // Only attempt initialization if:
-    // 1. Wallet is ready (no error, has chain and client)
-    // 2. Not currently initializing
-    // 3. Haven't successfully initialized yet
-    if (walletClient && chain && !WalletError && !isInitializingRef.current && !hasInitializedRef.current) {
-      console.log('Wallet ready, initializing Fangorn...');
-      initializeFangorn();
-    }
-  }, [walletClient, chain, WalletError, initializeFangorn]);
-
-  // Reset initialization status when wallet changes
-  useEffect(() => {
-    console.log('Wallet client changed resetting Fangorn state...');
-    hasInitializedRef.current = false;
-    isInitializingRef.current = false;
+  // Wait for walletClient to sync with current address
+  if (walletClient.account?.address?.toLowerCase() !== address.toLowerCase()) {
     setClient(null);
-    setError(null);
     setLoading(true);
-  }, [walletClient]);
+    return;
+  }
+
+  initializeFangorn();
+}, [address, isConnected, walletClient, initializeFangorn]);
 
   return (
-    <FangornContext.Provider value={{ client, loading, error, retry }}>
+    <FangornContext.Provider value={{ client, loading, error, retry: initializeFangorn }}>
       {children}
     </FangornContext.Provider>
   );

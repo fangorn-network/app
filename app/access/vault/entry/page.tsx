@@ -91,8 +91,6 @@ export default function Page() {
     router.push('/access/vault');
   };
 
-  console.log("selected entry: ", selectedEntry);
-
   if (!selectedEntry) {
     router.push("/access/vault");
   } else {
