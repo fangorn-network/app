@@ -1,7 +1,7 @@
 'use client';
 
-import { ReactNode, useEffect, useRef } from 'react';
-import { useConnect, useConnection, useConnectors } from 'wagmi';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { useConfig, useConnect, useConnection, useConnectors } from 'wagmi';
 import { useFangorn } from './fangornProvider';
 import { RpcError } from 'viem';
 
@@ -10,6 +10,9 @@ interface BlockingStatusCheckProps {
 }
 
 export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
+
+  const [hasMounted, setHasMounted] = useState(false)
+
   const { isConnected, status: accountStatus } = useConnection();
   const { mutate: connect, status: connectStatus, error } = useConnect();
   const connectors = useConnectors();
@@ -36,12 +39,24 @@ export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
     }
   }, [error]);
 
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+
+  if (!hasMounted) {
+    return <div className="app">      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="loading-text">Getting Things Ready...</p>
+      </div></div>
+  }
+
   // If wagmi is still resolving the session, block and show loading.
   if (isLoading) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p className="loading-text">Connecting to wallet...</p>
+        <p className="loading-text">Connecting to Wallet...</p>
       </div>
     );
   }
