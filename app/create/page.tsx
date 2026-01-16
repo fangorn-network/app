@@ -29,10 +29,10 @@ export default function Page() {
       } else {
         showError('Vault Creation Failed');
       }
-    } catch(err) {
+    } catch (err) {
       showError(err as Error);
     }
-  }
+  };
 
   return (
     <div>

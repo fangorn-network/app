@@ -62,7 +62,9 @@ export default function Page() {
         if (!client) {
           showError('The fangorn client never loaded');
         } else {
-          const manifest = await client.fetchManifest(manifestInfo.manifestCid!);
+          const manifest = await client.fetchManifest(
+            manifestInfo.manifestCid!
+          );
           if (!manifest) {
             // TODO: Display error saying something went wrong with manifest retrieval
             showError('An error occurred when retrieving the manifest');
@@ -74,8 +76,8 @@ export default function Page() {
           }
         }
       }
-    } catch(err) {
-      showError(err as Error)
+    } catch (err) {
+      showError(err as Error);
     }
   };
 

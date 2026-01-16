@@ -10,22 +10,21 @@ interface BlockingStatusCheckProps {
 }
 
 export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
+  const [hasMounted, setHasMounted] = useState(false);
 
-  const [hasMounted, setHasMounted] = useState(false)
-
-  const { isConnected, status: accountStatus} = useConnection();
-  const { mutate: connect, status: connectStatus, error} = useConnect();
+  const { isConnected, status: accountStatus } = useConnection();
+  const { mutate: connect, status: connectStatus, error } = useConnect();
   const connectors = useConnectors();
   const { loading: fangornLoading, error: fangornError, retry } = useFangorn();
   const didUserReject = useRef(false);
   const didAttemptAutoConnect = useRef(false);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
 
   const injected = connectors.find((c) => c.id === 'injected');
 
   useEffect(() => {
     if (error) {
-      console.log('received error', error)
+      console.log('received error', error);
       const isRejection =
         error.name === 'UserRejectedRequestError' ||
         (error as RpcError).code === 4001;
@@ -36,27 +35,28 @@ export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
   }, [error]);
 
   useEffect(() => {
-
-    const loadingStatus = accountStatus === 'connecting' ||
-    accountStatus === 'reconnecting' ||
-    connectStatus === 'pending';
+    const loadingStatus =
+      accountStatus === 'connecting' ||
+      accountStatus === 'reconnecting' ||
+      connectStatus === 'pending';
 
     setIsLoading(loadingStatus);
-
-  }, [accountStatus, connectStatus])
+  }, [accountStatus, connectStatus]);
 
   useEffect(() => {
-    if(!hasMounted) {
-        setHasMounted(true)
-        setIsLoading(true)
+    if (!hasMounted) {
+      setHasMounted(true);
+      setIsLoading(true);
     }
-  }, [hasMounted])
+  }, [hasMounted]);
 
   if (!hasMounted) {
-    return <div className="loading-container">
+    return (
+      <div className="loading-container">
         <div className="spinner"></div>
         <p className="loading-text">Getting Things Ready...</p>
       </div>
+    );
   }
 
   // If wagmi is still resolving the session, block and show loading.
