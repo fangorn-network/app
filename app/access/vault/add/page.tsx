@@ -40,38 +40,42 @@ export default function Page() {
     const tag = secretLabel || 'tag';
     let fileData: Filedata;
     setIsCreatingEntry(true);
-    if (uploadMode === 'text') {
-      const data = secretInfo;
-      fileData = { tag, data, extension: '.txt', fileType: 'text/plain' };
-    } else {
-      const data = secretInfo;
-      const extension = selectedFile!.name.slice(
-        selectedFile!.name.lastIndexOf('.')
-      );
-      const fileType = selectedFile!.type;
-      fileData = { tag, data, extension, fileType };
-    }
-    setLoadingText('Uploading new entry...');
-    const vaultHex = currentVaultId as `0x${string}`;
-    const manifestInfo = await client?.upload(vaultHex, [fileData], false);
-    if (!manifestInfo) {
-      showError('An error occurred when retrieving the manifest information');
-    } else {
-      setLoadingText('Retreiving new manifest...');
-      if (!client) {
-        showError('The fangorn client never loaded');
+    try {
+      if (uploadMode === 'text') {
+        const data = secretInfo;
+        fileData = { tag, data, extension: '.txt', fileType: 'text/plain' };
       } else {
-        const manifest = await client.fetchManifest(manifestInfo.manifestCid!);
-        if (!manifest) {
-          // TODO: Display error saying something went wrong with manifest retrieval
-          showError('An error occurred when retrieving the manifest');
+        const data = secretInfo;
+        const extension = selectedFile!.name.slice(
+          selectedFile!.name.lastIndexOf('.')
+        );
+        const fileType = selectedFile!.type;
+        fileData = { tag, data, extension, fileType };
+      }
+      setLoadingText('Uploading new entry...');
+      const vaultHex = currentVaultId as `0x${string}`;
+      const manifestInfo = await client?.upload(vaultHex, [fileData], false);
+      if (!manifestInfo) {
+        showError('An error occurred when retrieving the manifest information');
+      } else {
+        setLoadingText('Retreiving new manifest...');
+        if (!client) {
+          showError('The fangorn client never loaded');
         } else {
-          setVaultManifest(manifest);
-          setEntries(manifest.entries);
-          setLoadingText('Complete!');
-          router.push('/access/vault/add/success');
+          const manifest = await client.fetchManifest(manifestInfo.manifestCid!);
+          if (!manifest) {
+            // TODO: Display error saying something went wrong with manifest retrieval
+            showError('An error occurred when retrieving the manifest');
+          } else {
+            setVaultManifest(manifest);
+            setEntries(manifest.entries);
+            setLoadingText('Complete!');
+            router.push('/access/vault/add/success');
+          }
         }
       }
+    } catch(err) {
+      showError(err as Error)
     }
   };
 

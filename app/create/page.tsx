@@ -20,18 +20,20 @@ export default function Page() {
   const handleCreateVault = async () => {
     setIsCreatingVault(true);
     setLoadingText('Creating Vault...');
-
-    const vaultId = await client?.createVault(vaultName, password);
-
-    console.log('vaultId: ', vaultId);
-
-    if (vaultId) {
-      setVaultId(vaultId);
-      router.push('/create/success');
-    } else {
-      showError('Vault Creation Failed');
+    try {
+      const vaultId = await client?.createVault(vaultName, password);
+      console.log('vaultId: ', vaultId);
+      if (vaultId) {
+        setVaultId(vaultId);
+        router.push('/create/success');
+      } else {
+        showError('Vault Creation Failed');
+      }
+    } catch(err) {
+      showError(err as Error);
     }
-  };
+  }
+
   return (
     <div>
       {isCreatingVault ? (
