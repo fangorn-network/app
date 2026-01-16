@@ -45,8 +45,11 @@ export default function Page() {
       console.log('Loading vault...')
       setLoadingText('Loading vault...');
       const vaultHex = currentVaultId as `0x${string}`;
+      console.log('vaultHex: ', vaultHex)
       const vault = await client.getVault(vaultHex);
+      console.log('vault: ', vault)
       setVaultName(vault.name);
+      console.log('vault.name: ', vault.name)
       setVault(vault);
       if (vault.manifestCid) {
         setLoadingText('Loading manifest...');
