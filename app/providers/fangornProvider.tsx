@@ -38,9 +38,7 @@ export function FangornProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      console.log('Initializing Fangorn client for address:', address);
-
-      console.log("walletClient: ", walletClient);
+      console.log('Initializing Fangorn client');
 
       const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
       if (!gateway) throw new Error('NEXT_PUBLIC_PINATA_GATEWAY required');

@@ -15,7 +15,6 @@ export default function Page() {
 
   useEffect(() => {
     const loadVaults = async () => {
-      console.log("Loading vaults");
       try {
         setIsLoading(true);
         // loads vaultIds that we own
