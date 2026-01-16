@@ -62,7 +62,7 @@ export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
   // If wagmi is still resolving the session, block and show loading.
   // Sometimes we hit weird issues where the client is connected
   // but a refresh has been caused that doesn't update the loading
-  // state
+  // state.
   if (isLoading && !isConnected) {
     return (
       <div className="loading-container">
