@@ -7,7 +7,7 @@ export default function Page() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/access/vault');
-    }, 1000);
+    }, 2000);
     // Cleanup function to clear timeout if component unmounts
     return () => clearTimeout(timer);
   }, [router]);
