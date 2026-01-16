@@ -42,6 +42,7 @@ export default function Page() {
     hasLoadedRef.current = true;
 
     const loadVault = async () => {
+      console.log('Loading vault...')
       setLoadingText('Loading vault...');
       const vaultHex = currentVaultId as `0x${string}`;
       const vault = await client.getVault(vaultHex);
@@ -49,6 +50,7 @@ export default function Page() {
       setVault(vault);
       if (vault.manifestCid) {
         setLoadingText('Loading manifest...');
+        console.log('Loading vault...')
         const manifest = await client.fetchManifest(vault.manifestCid);
         setVaultManifest(manifest);
         setEntries(manifest.entries);
