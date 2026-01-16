@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { useConfig, useConnect, useConnection, useConnectors } from 'wagmi';
+import { useConnect, useConnection, useConnectors } from 'wagmi';
 import { useFangorn } from './fangornProvider';
 import { RpcError } from 'viem';
 
