@@ -13,26 +13,22 @@ export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
 
   const [hasMounted, setHasMounted] = useState(false)
 
-  const { isConnected, status: accountStatus } = useConnection();
-  const { mutate: connect, status: connectStatus, error } = useConnect();
+  const { isConnected, status: accountStatus} = useConnection();
+  const { mutate: connect, status: connectStatus, error} = useConnect();
   const connectors = useConnectors();
   const { loading: fangornLoading, error: fangornError, retry } = useFangorn();
   const didUserReject = useRef(false);
   const didAttemptAutoConnect = useRef(false);
+  const [isLoading, setIsLoading] = useState(true)
 
   const injected = connectors.find((c) => c.id === 'injected');
 
-  const isLoading =
-    accountStatus === 'connecting' ||
-    accountStatus === 'reconnecting' ||
-    connectStatus === 'pending';
-
   useEffect(() => {
     if (error) {
+      console.log('received error', error)
       const isRejection =
         error.name === 'UserRejectedRequestError' ||
         (error as RpcError).code === 4001;
-
       if (isRejection) {
         didUserReject.current = true;
       }
@@ -40,19 +36,34 @@ export function BlockingStatusCheck({ children }: BlockingStatusCheckProps) {
   }, [error]);
 
   useEffect(() => {
-    setHasMounted(true)
-  }, [])
 
+    const loadingStatus = accountStatus === 'connecting' ||
+    accountStatus === 'reconnecting' ||
+    connectStatus === 'pending';
+
+    setIsLoading(loadingStatus);
+
+  }, [accountStatus, connectStatus])
+
+  useEffect(() => {
+    if(!hasMounted) {
+        setHasMounted(true)
+        setIsLoading(true)
+    }
+  }, [hasMounted])
 
   if (!hasMounted) {
-    return <div className="app">      <div className="loading-container">
+    return <div className="loading-container">
         <div className="spinner"></div>
         <p className="loading-text">Getting Things Ready...</p>
-      </div></div>
+      </div>
   }
 
   // If wagmi is still resolving the session, block and show loading.
-  if (isLoading) {
+  // Sometimes we hit weird issues where the client is connected
+  // but a refresh has been caused that doesn't update the loading
+  // state
+  if (isLoading && !isConnected) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>

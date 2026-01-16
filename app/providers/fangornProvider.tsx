@@ -29,13 +29,12 @@ export function FangornProvider({ children }: { children: ReactNode }) {
   const { address, isConnected } = useConnection();
   const { data: walletClient } = useWalletClient();
   const [client, setClient] = useState<Fangorn | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const initializeFangorn = useCallback(async () => {
     if (!address || !isConnected || !walletClient) {
       setClient(null);
-      setLoading(false);
       setError(null);
       return;
     }
@@ -91,10 +90,8 @@ export function FangornProvider({ children }: { children: ReactNode }) {
   }, [isConnected, walletClient, address]);
 
   useEffect(() => {
-    // Don't initialize until walletClient matches the current address
     if (!address || !isConnected || !walletClient) {
       setClient(null);
-      setLoading(false);
       return;
     }
 

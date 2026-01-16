@@ -14,8 +14,6 @@ export default async function RootLayout({
     (await headers()).get('cookie')
   );
 
-  console.log('initial state', initialState);
-
   return (
     <html lang="en">
       <body>
