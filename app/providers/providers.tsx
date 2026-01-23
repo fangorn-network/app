@@ -7,7 +7,7 @@ import { getConfig } from '@/app/wagmi-config';
 import { FangornProvider } from './fangornProvider';
 import { AppContextProvider } from './vaultContextProvider';
 import { ErrorProvider } from './errorContextProvider';
-import { BlockingStatusCheck } from './blockingStatusCheck';
+import { LitProvider } from './litProvider';
 
 type Props = {
   children: ReactNode;
@@ -22,14 +22,16 @@ export function Providers({ children, initialState }: Props) {
       <WagmiProvider
         config={config}
         initialState={initialState}
-        reconnectOnMount={true}
+        reconnectOnMount={false}
       >
         <QueryClientProvider client={queryClient}>
-          <FangornProvider>
-            <AppContextProvider>
-              <BlockingStatusCheck>{children}</BlockingStatusCheck>
-            </AppContextProvider>
-          </FangornProvider>
+          <LitProvider>
+            <FangornProvider>
+              <AppContextProvider>
+                {children}
+              </AppContextProvider>
+            </FangornProvider>
+          </LitProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </ErrorProvider>

@@ -9,7 +9,7 @@ import {
   useCallback,
 } from 'react';
 import { AppConfig, Fangorn } from 'fangorn-sdk';
-import { useConnection, useWalletClient } from 'wagmi';
+import { useLit } from './litProvider';
 
 interface FangornContextType {
   client: Fangorn | null;
@@ -26,14 +26,15 @@ const FangornContext = createContext<FangornContextType>({
 });
 
 export function FangornProvider({ children }: { children: ReactNode }) {
-  const { address, isConnected } = useConnection();
-  const { data: walletClient } = useWalletClient();
+  // const { address, isConnected } = useConnection();
+  // const { data: walletClient } = useWalletClient();
+  const {viemWalletClient: walletClient} = useLit();
   const [client, setClient] = useState<Fangorn | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const initializeFangorn = useCallback(async () => {
-    if (!address || !isConnected || !walletClient) {
+    if (!walletClient) {
       setClient(null);
       setError(null);
       return;
@@ -68,7 +69,6 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         circuitJsonCid,
         zkGateContractAddress,
         chainName: 'baseSepolia',
-        domain: window.location.host,
         rpcUrl: 'https://sepolia.base.org',
       };
 
@@ -76,6 +76,7 @@ export function FangornProvider({ children }: { children: ReactNode }) {
         jwt,
         gateway,
         walletClient,
+        window.location.origin,
         fangornConfig
       );
 
@@ -87,25 +88,16 @@ export function FangornProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [isConnected, walletClient, address]);
+  }, [walletClient]);
 
   useEffect(() => {
-    if (!address || !isConnected || !walletClient) {
+    if (!walletClient) {
       setClient(null);
-      return;
-    }
-
-    // Wait for walletClient to sync with current address
-    if (
-      walletClient.account?.address?.toLowerCase() !== address.toLowerCase()
-    ) {
-      setClient(null);
-      setLoading(true);
       return;
     }
 
     initializeFangorn();
-  }, [address, isConnected, walletClient, initializeFangorn]);
+  }, [ walletClient, initializeFangorn]);
 
   return (
     <FangornContext.Provider
